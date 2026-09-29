@@ -16,6 +16,8 @@ const path = require('path');
 
 const F_OBS = path.join(__dirname, 'data', 'observations.json');
 const F_SYNC = path.join(__dirname, 'data', 'sync.json');
+const F_EVENTS = path.join(__dirname, 'data', 'events.json');
+const F_NORMALS = path.join(__dirname, 'data', 'normals.json');
 
 const SZ = { lat: 22.5431, lon: 114.0579 }; // 深圳市区（Open-Meteo 邻近格点）
 const SERIES_START = '2026-05-01'; // 日值序列起点（本轮厄尔尼诺 5 月进入状态）
@@ -41,7 +43,7 @@ async function getText(url) {
 
 /* ---------- Open-Meteo：深圳日值序列 ---------- */
 
-const DAILY_KEYS = ['temperature_2m_mean', 'temperature_2m_max', 'temperature_2m_min', 'precipitation_sum'];
+const DAILY_KEYS = ['temperature_2m_mean', 'temperature_2m_max', 'temperature_2m_min', 'precipitation_sum', 'relative_humidity_2m_mean'];
 
 async function fetchSzDaily() {
   const end = today();
@@ -174,6 +176,133 @@ function deriveDaily(daily, manualMetrics) {
   return { obs, currentMonth };
 }
 
+/* ---------- 事件检测器（数据驱动，规则见 README） ---------- */
+
+function detectEvents(daily, derivedObs) {
+  const events = [];
+  if (!daily || daily.length < 3) return events;
+
+  // 寒潮过程：24h 日均温降幅（连续日合并进 note，逐日生成便于对照 P2-2）
+  for (let i = 1; i < daily.length; i++) {
+    const a = daily[i - 1], b = daily[i];
+    if (a.temperature_2m_mean === undefined || b.temperature_2m_mean === undefined) continue;
+    const drop = round(a.temperature_2m_mean - b.temperature_2m_mean, 1);
+    if (drop >= 8) {
+      events.push({
+        type: 'cold_wave', date: b.date,
+        title: drop >= 10
+          ? `强寒潮过程：单日日均温降幅 ${drop}℃`
+          : `寒潮预警：单日日均温降幅 ${drop}℃`,
+        note: `${a.date} → ${b.date}，日均温 ${round(a.temperature_2m_mean, 1)}℃ → ${round(b.temperature_2m_mean, 1)}℃（降幅 ≥8℃ 预警 / ≥10℃ 强寒潮）`,
+      });
+    }
+  }
+
+  // 高温热浪：连续 ≥3 天日最高 ≥33℃
+  let heat = [];
+  const flushHeat = () => {
+    if (heat.length >= 3) {
+      const peak = Math.max(...heat.map((r) => r.temperature_2m_max));
+      events.push({
+        type: 'heatwave', date: heat[0].date,
+        title: `高温热浪：连续 ${heat.length} 天 ≥33℃，峰值 ${round(peak, 1)}℃`,
+        note: `${heat[0].date} ~ ${heat[heat.length - 1].date}`,
+      });
+    }
+    heat = [];
+  };
+  for (const r of daily) {
+    if (r.temperature_2m_max !== undefined && r.temperature_2m_max >= 33) heat.push(r); else flushHeat();
+  }
+  flushHeat();
+
+  // 暴雨 / 大暴雨
+  for (const r of daily) {
+    if (r.precipitation_sum === undefined) continue;
+    if (r.precipitation_sum >= 100)
+      events.push({ type: 'heavy_rain', date: r.date, title: `大暴雨：日雨量 ${round(r.precipitation_sum, 1)}mm`, note: '日雨量 ≥100mm（P3-3 判定阈值）' });
+    else if (r.precipitation_sum >= 50)
+      events.push({ type: 'heavy_rain', date: r.date, title: `暴雨：日雨量 ${round(r.precipitation_sum, 1)}mm`, note: '日雨量 ≥50mm' });
+  }
+
+  // 干旱少雨段：连续 ≥20 天有效降水 <1mm
+  let dry = [];
+  const flushDry = () => {
+    if (dry.length >= 20)
+      events.push({ type: 'dry_spell', date: dry[0].date, title: `干旱少雨段：连续 ${dry.length} 天有效降水 <1mm`, note: `${dry[0].date} ~ ${dry[dry.length - 1].date}` });
+    dry = [];
+  };
+  for (const r of daily) {
+    if (r.precipitation_sum !== undefined && r.precipitation_sum < 1) dry.push(r); else flushDry();
+  }
+  flushDry();
+
+  // 湿冷时段：连续 ≥3 天 日均温 ≤12℃ 且日湿度 ≥80%
+  let hc = [];
+  const flushHc = () => {
+    if (hc.length >= 3) {
+      const minT = Math.min(...hc.map((r) => r.temperature_2m_mean));
+      events.push({
+        type: 'humid_cold', date: hc[0].date,
+        title: `湿冷时段：连续 ${hc.length} 天 日均温≤12℃ 且湿度≥80%（最冷日均 ${round(minT, 1)}℃）`,
+        note: `${hc[0].date} ~ ${hc[hc.length - 1].date}`,
+      });
+    }
+    hc = [];
+  };
+  for (const r of daily) {
+    if (r.temperature_2m_mean !== undefined && r.relative_humidity_2m_mean !== undefined
+      && r.temperature_2m_mean <= 12 && r.relative_humidity_2m_mean >= 80) hc.push(r); else flushHc();
+  }
+  flushHc();
+
+  // 月值显著偏离常年（月值记录落库时触发）
+  let normals = {};
+  try { normals = JSON.parse(fs.readFileSync(F_NORMALS, 'utf8')); } catch { /* 常年值缺失则跳过 */ }
+  for (const o of derivedObs.filter((o) => o.metric === 'sz_temp_month')) {
+    const n = Number(normals.month_temp && normals.month_temp[String(Number(o.date.slice(5, 7)))]);
+    if (!Number.isFinite(n)) continue;
+    const anom = round(o.value - n, 1);
+    if (Math.abs(anom) >= 1.0)
+      events.push({ type: 'month_anomaly', date: o.date, title: `${o.date.slice(0, 7)} 均温 ${fmtVal(o.value)}℃：较常年${anom > 0 ? '偏高' : '偏低'} ${Math.abs(anom)}℃`, note: '月均温偏离 ≥1.0℃ 触发' });
+  }
+  for (const o of derivedObs.filter((o) => o.metric === 'sz_rain_month')) {
+    const n = Number(normals.month_rain && normals.month_rain[String(Number(o.date.slice(5, 7)))]);
+    if (!Number.isFinite(n) || n <= 0) continue;
+    const ratio = (o.value - n) / n;
+    if (ratio <= -0.5 && n - o.value >= 20)
+      events.push({ type: 'month_anomaly', date: o.date, title: `${o.date.slice(0, 7)} 雨量 ${fmtVal(o.value)}mm：较常年偏少 ${Math.round(-ratio * 100)}%`, note: '月雨量偏离 ≥50% 且 ≥20mm 触发' });
+    else if (ratio >= 0.5)
+      events.push({ type: 'month_anomaly', date: o.date, title: `${o.date.slice(0, 7)} 雨量 ${fmtVal(o.value)}mm：较常年偏多 ${Math.round(ratio * 100)}%`, note: '月雨量偏离 ≥50% 触发' });
+  }
+
+  // 季节转换（入秋/入冬自动判定成功时）
+  for (const o of derivedObs.filter((o) => o.metric === 'sz_enter_autumn' || o.metric === 'sz_enter_winter')) {
+    const label = o.metric === 'sz_enter_autumn' ? '入秋' : '入冬';
+    events.push({ type: 'season_shift', date: o.date, title: `${label}：${o.date}`, note: o.note });
+  }
+
+  return events.map((e) => ({
+    ...e,
+    id: `auto-evt-${e.type}-${e.date}`,
+    level: '研判',
+    source: '跟踪看板 · 数据检测',
+    auto: true,
+  }));
+}
+
+function upsertEvents(store, records) {
+  let added = 0, updated = 0;
+  for (const rec of records) {
+    const i = store.events.findIndex((e) => e.id === rec.id);
+    const full = { ...rec, fetchedAt: new Date().toISOString() };
+    if (i >= 0) { store.events[i] = full; updated++; } else { store.events.push(full); added++; }
+  }
+  return { added, updated };
+}
+
+const fmtVal = (x) => { const n = Number(x); return Number.isInteger(n) ? String(n) : String(round(n, 2)); };
+
 /* ---------- NOAA CPC：Niño3.4 月距平 ---------- */
 
 async function fetchNino() {
@@ -228,6 +357,18 @@ async function syncAll(manual = false) {
       const c = upsert(store, derived.obs);
       currentMonth = derived.currentMonth;
       status.results.push({ name: 'Open-Meteo 深圳日值', ok: true, detail: `${daily.length} 天日值 · 落库新增 ${c.added} / 更新 ${c.updated} / 保留人工 ${c.skipped}` });
+
+      // 数据驱动事件检测（时间线）
+      try {
+        const evStore = JSON.parse(fs.readFileSync(F_EVENTS, 'utf8'));
+        const evts = detectEvents(daily, derived.obs);
+        const c3 = upsertEvents(evStore, evts);
+        fs.writeFileSync(F_EVENTS, JSON.stringify(evStore, null, 2) + '\n', 'utf8');
+        status.results.push({ name: '事件检测', ok: true, detail: `自动事件新增 ${c3.added} / 更新 ${c3.updated}（时间线现共 ${evStore.events.length} 条）` });
+      } catch (e) {
+        status.results.push({ name: '事件检测', ok: false, error: e.message });
+      }
+
       try {
         const cw = await getJSON(`https://api.open-meteo.com/v1/forecast?latitude=${SZ.lat}&longitude=${SZ.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=Asia%2FShanghai`);
         currentWeather = { time: cw.current.time, temp: cw.current.temperature_2m, humidity: cw.current.relative_humidity_2m, wind: cw.current.wind_speed_10m };

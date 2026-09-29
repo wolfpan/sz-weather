@@ -7,3 +7,6 @@ Thumbs.db
 
 # 运行日志
 *.log
+
+# 含密钥的本地配置（config.example.json 是入库的模板）
+data/config.json

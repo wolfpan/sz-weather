@@ -48,9 +48,18 @@
     <div id="board"></div>
   </section>
 
+  <section class="panel" id="ai-panel">
+    <h2 class="ai-head">AI 研判
+      <span class="hint">由大模型基于看板数据生成 · AI 生成，仅供研究参考</span>
+      <button id="btn-analysis" type="button">生成简报</button>
+    </h2>
+    <div id="ai-body"></div>
+  </section>
+
   <div class="two-col">
     <section class="panel">
-      <h2>事件时间线 <span class="hint">披露 / 媒体 / 历史对照</span></h2>
+      <h2>事件时间线 <span class="hint">披露 / 媒体 / 研判 / 数据检测自动生成</span></h2>
+      <div class="chip-row" id="tl-filters"></div>
       <form id="event-form" class="form row-form">
         <input type="date" name="date" required>
         <select name="level">

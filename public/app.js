@@ -424,15 +424,103 @@ function renderPredCard(p) {
   </article>`;
 }
 
-/* ---------- 时间线 ---------- */
+/* ---------- AI 研判面板 ---------- */
+
+function md2html(md) {
+  const lines = String(md).split(/\r?\n/);
+  const out = [];
+  let inUl = false, inTable = false, thPending = false;
+  const closeUl = () => { if (inUl) { out.push('</ul>'); inUl = false; } };
+  const closeTable = () => { if (inTable) { out.push('</tbody></table>'); inTable = false; } };
+  const inline = (t) => esc(t)
+    .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+    .replace(/`([^`]+?)`/g, '<code>$1</code>');
+  for (const raw of lines) {
+    const t = raw.trim();
+    if (/^#{1,3}\s/.test(t)) {
+      closeUl(); closeTable();
+      out.push(`<h4>${inline(t.replace(/^#{1,3}\s/, ''))}</h4>`);
+    } else if (/^####\s/.test(t)) {
+      closeUl(); closeTable();
+      out.push(`<h5>${inline(t.slice(5))}</h5>`);
+    } else if (/^[-*]\s/.test(t)) {
+      closeTable();
+      if (!inUl) { out.push('<ul>'); inUl = true; }
+      out.push(`<li>${inline(t.slice(2))}</li>`);
+    } else if (t.startsWith('|')) {
+      closeUl();
+      const cells = t.split('|').slice(1, -1).map((c) => c.trim());
+      if (cells.length && cells.every((c) => /^:?-{2,}:?$/.test(c))) continue; // 表头分隔行
+      if (!inTable) { out.push('<table class="md-table"><tbody>'); inTable = true; thPending = true; }
+      const tag = thPending ? 'th' : 'td';
+      thPending = false;
+      out.push(`<tr>${cells.map((c) => `<${tag}>${inline(c)}</${tag}>`).join('')}</tr>`);
+    } else if (!t) {
+      closeUl(); closeTable();
+    } else {
+      closeUl(); closeTable();
+      out.push(`<p>${inline(t)}</p>`);
+    }
+  }
+  closeUl(); closeTable();
+  return out.join('');
+}
+
+function renderAI() {
+  const a = STATE.analysis || { llmConfigured: false, runs: [] };
+  const body = $('#ai-body');
+  const btn = $('#btn-analysis');
+  btn.style.display = a.llmConfigured ? '' : 'none';
+  if (!a.llmConfigured) {
+    body.innerHTML = `<div class="empty">尚未配置大模型：复制 <code>data/config.example.json</code> 为 <code>data/config.json</code>，填入 OpenAI 兼容接口的 <code>baseUrl / apiKey / model</code>（支持智谱 GLM、DeepSeek、OpenAI 等），保存后刷新本页即可启用「生成简报」与每日自动研判。</div>`;
+    return;
+  }
+  if (!a.runs.length) {
+    body.innerHTML = '<div class="empty">尚未生成简报，点击右上角「生成简报」。</div>';
+    return;
+  }
+  const [latest, ...rest] = a.runs;
+  body.innerHTML = `
+    <div class="ai-meta">
+      <span>${esc(latest.at.slice(0, 16).replace('T', ' '))}</span>
+      <span>· ${esc(latest.model)}</span>
+      <span>· 触发：${esc(latest.trigger || '手动')}</span>
+      <span>· 数据截至 ${esc((latest.dataAsOf || '').slice(0, 16).replace('T', ' '))}</span>
+      ${rest.length ? `<span>· 历史 ${rest.length} 次</span>` : ''}
+    </div>
+    <div class="ai-content">${md2html(latest.md)}</div>
+    ${rest.length ? `<details class="ai-history"><summary>历史简报</summary><ul>${rest.map((r) => `<li>${esc(r.at.slice(0, 16).replace('T', ' '))} · ${esc(r.model)} · ${esc(r.trigger || '手动')}</li>`).join('')}</ul></details>` : ''}`;
+}
+
+/* ---------- 事件时间线（含来源筛选） ---------- */
+
+const TL_FILTERS = [
+  ['all', '全部'], ['auto', '自动生成'], ['manual', '人工录入'],
+  ['披露', '披露'], ['媒体', '媒体'], ['研判', '研判'], ['历史对照', '历史对照'],
+];
+let tlFilter = 'all';
+
+function renderTlFilters() {
+  $('#tl-filters').innerHTML = TL_FILTERS.map(([k, label]) =>
+    `<button type="button" class="chip-btn ${tlFilter === k ? 'active' : ''}" data-k="${k}">${label}</button>`
+  ).join('');
+}
+
 function renderTimeline() {
-  const events = [...STATE.events].sort((a, b) => (a.date < b.date ? 1 : -1));
-  if (!events.length) { $('#timeline').innerHTML = '<div class="empty">暂无事件</div>'; return; }
+  renderTlFilters();
+  const all = [...STATE.events].sort((a, b) => (a.date < b.date ? 1 : -1));
+  const events = all.filter((e) => {
+    if (tlFilter === 'all') return true;
+    if (tlFilter === 'auto') return !!e.auto;
+    if (tlFilter === 'manual') return !e.auto;
+    return e.level === tlFilter;
+  });
+  if (!events.length) { $('#timeline').innerHTML = '<div class="empty">该筛选下暂无事件</div>'; return; }
   $('#timeline').innerHTML = `<ol class="timeline">${events.map((e) => `
     <li>
       <span class="t-date">${esc(e.date)}</span>
       <div class="t-body">
-        <span class="chip lv-${esc(e.level)}">${esc(e.level)}</span>${esc(e.title)}
+        <span class="chip lv-${esc(e.level)}">${esc(e.level)}</span>${e.auto ? '<span class="tag-auto">自动</span> ' : ''}${esc(e.title)}
         ${e.source ? `<div class="t-src">来源：${esc(e.source)}</div>` : ''}
       </div>
     </li>`).join('')}</ol>`;
@@ -540,6 +628,27 @@ $('#obs-form').addEventListener('submit', submitObservation);
 $('#event-form').addEventListener('submit', submitEvent);
 $('#btn-refresh').addEventListener('click', () => refresh().catch(() => toast('刷新失败', true)));
 
+$('#tl-filters').addEventListener('click', (e) => {
+  const btn = e.target.closest('.chip-btn');
+  if (!btn) return;
+  tlFilter = btn.dataset.k;
+  renderTimeline();
+});
+
+$('#btn-analysis').addEventListener('click', async () => {
+  const btn = $('#btn-analysis');
+  btn.disabled = true;
+  const old = btn.textContent;
+  btn.textContent = '生成中…（约 10~30 秒）';
+  try {
+    await API.post('/api/analysis', {});
+    await refresh();
+    toast('AI 简报已生成');
+  } catch (err) { toast(err.message, true); }
+  btn.disabled = false;
+  btn.textContent = old;
+});
+
 $('#btn-sync').addEventListener('click', async () => {
   const btn = $('#btn-sync');
   btn.disabled = true;
@@ -568,6 +677,7 @@ async function refresh() {
   renderTempChart();
   renderRainChart();
   renderBoard();
+  renderAI();
   renderTimeline();
   renderObsTable();
 }

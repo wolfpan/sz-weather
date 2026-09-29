@@ -10,6 +10,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { syncAll, readStatus } = require('./sync');
+const llm = require('./llm');
 
 const ROOT = __dirname;
 const PUBLIC_DIR = path.join(ROOT, 'public');
@@ -23,6 +24,7 @@ const F = {
   observations: path.join(DATA_DIR, 'observations.json'),
   events: path.join(DATA_DIR, 'events.json'),
   sync: path.join(DATA_DIR, 'sync.json'),
+  analysis: path.join(DATA_DIR, 'analysis.json'),
 };
 
 const readJSON = (file, fallback) => {
@@ -178,6 +180,8 @@ function buildState() {
     .slice(0, 3)
     .map((p) => ({ id: p.id, title: p.title, end: p.window.end, statusLabel: p._eval.statusLabel }));
 
+  const runs = (readJSON(F.analysis, { runs: [] }).runs || []).slice(0, 10);
+
   return {
     now: new Date().toISOString(),
     metrics,
@@ -186,6 +190,7 @@ function buildState() {
     observations: obs,
     events,
     sync: readStatus(),
+    analysis: { llmConfigured: llm.loadConfig().enabled, runs },
     summary: { total: predictions.length, counts, nextChecks },
   };
 }
@@ -245,6 +250,20 @@ async function handleApi(req, res, pathname) {
   if (req.method === 'POST' && pathname === '/api/sync') {
     await syncAll(true);
     return json(res, state());
+  }
+
+  if (req.method === 'POST' && pathname === '/api/analysis') {
+    const st = state();
+    const { md, model } = await llm.callLLM(st);
+    const runs = llm.saveRun({
+      id: 'A' + Date.now().toString(36),
+      at: new Date().toISOString(),
+      model,
+      dataAsOf: st.now,
+      trigger: '手动',
+      md,
+    });
+    return json(res, { ...state(), _latestRun: runs.runs[0] });
   }
 
   if (req.method === 'POST' && pathname === '/api/observations') {
@@ -345,3 +364,21 @@ server.listen(PORT, () => {
 // 自动同步：启动后 2.5 秒首跑，之后每 30 分钟一次（外部源为日/周级更新，30 分钟足够"实时"）
 setTimeout(() => { syncAll().catch((e) => console.error('[sync]', e.message)); }, 2500);
 setInterval(() => { syncAll().catch((e) => console.error('[sync]', e.message)); }, 30 * 60 * 1000);
+
+// AI 简报：每日一次（每 10 分钟检查一次当天是否已生成）；需在 data/config.json 配置 LLM
+setInterval(() => {
+  try {
+    const conf = llm.loadConfig();
+    if (!conf.enabled) return;
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const lastAuto = (llm.readAnalysis().runs || []).find((r) => r.trigger === '自动');
+    if (lastAuto && lastAuto.at.slice(0, 10) === todayStr) return;
+    const st = buildState();
+    llm.callLLM(st)
+      .then(({ md, model }) => {
+        llm.saveRun({ id: 'A' + Date.now().toString(36), at: new Date().toISOString(), model, dataAsOf: st.now, trigger: '自动', md });
+        console.log('[llm] 每日 AI 简报已生成');
+      })
+      .catch((e) => console.error('[llm] 每日简报生成失败：', e.message));
+  } catch { /* 忽略定时任务异常 */ }
+}, 10 * 60 * 1000);

@@ -55,6 +55,94 @@
       "level": "研判",
       "title": "接入开放数据源自动同步：Open-Meteo（深圳日值/实况）+ NOAA CPC（Niño3.4 月指数），每 30 分钟定时拉取，人工录入优先",
       "source": "跟踪看板"
+    },
+    {
+      "type": "heatwave",
+      "date": "2026-06-03",
+      "title": "高温热浪：连续 4 天 ≥33℃，峰值 33.8℃",
+      "note": "2026-06-03 ~ 2026-06-06",
+      "id": "auto-evt-heatwave-2026-06-03",
+      "level": "研判",
+      "source": "跟踪看板 · 数据检测",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:42:29.102Z"
+    },
+    {
+      "type": "heatwave",
+      "date": "2026-08-06",
+      "title": "高温热浪：连续 8 天 ≥33℃，峰值 35.7℃",
+      "note": "2026-08-06 ~ 2026-08-13",
+      "id": "auto-evt-heatwave-2026-08-06",
+      "level": "研判",
+      "source": "跟踪看板 · 数据检测",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:42:29.102Z"
+    },
+    {
+      "type": "heavy_rain",
+      "date": "2026-06-08",
+      "title": "暴雨：日雨量 50.3mm",
+      "note": "日雨量 ≥50mm",
+      "id": "auto-evt-heavy_rain-2026-06-08",
+      "level": "研判",
+      "source": "跟踪看板 · 数据检测",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:42:29.102Z"
+    },
+    {
+      "type": "heavy_rain",
+      "date": "2026-06-14",
+      "title": "暴雨：日雨量 83.6mm",
+      "note": "日雨量 ≥50mm",
+      "id": "auto-evt-heavy_rain-2026-06-14",
+      "level": "研判",
+      "source": "跟踪看板 · 数据检测",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:42:29.102Z"
+    },
+    {
+      "type": "heavy_rain",
+      "date": "2026-06-15",
+      "title": "暴雨：日雨量 50.1mm",
+      "note": "日雨量 ≥50mm",
+      "id": "auto-evt-heavy_rain-2026-06-15",
+      "level": "研判",
+      "source": "跟踪看板 · 数据检测",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:42:29.102Z"
+    },
+    {
+      "type": "heavy_rain",
+      "date": "2026-07-26",
+      "title": "大暴雨：日雨量 119.9mm",
+      "note": "日雨量 ≥100mm（P3-3 判定阈值）",
+      "id": "auto-evt-heavy_rain-2026-07-26",
+      "level": "研判",
+      "source": "跟踪看板 · 数据检测",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:42:29.102Z"
+    },
+    {
+      "type": "heavy_rain",
+      "date": "2026-07-27",
+      "title": "暴雨：日雨量 50.3mm",
+      "note": "日雨量 ≥50mm",
+      "id": "auto-evt-heavy_rain-2026-07-27",
+      "level": "研判",
+      "source": "跟踪看板 · 数据检测",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:42:29.102Z"
+    },
+    {
+      "type": "month_anomaly",
+      "date": "2026-07-31",
+      "title": "2026-07 雨量 502.4mm：较常年偏多 58%",
+      "note": "月雨量偏离 ≥50% 触发",
+      "id": "auto-evt-month_anomaly-2026-07-31",
+      "level": "研判",
+      "source": "跟踪看板 · 数据检测",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:42:29.102Z"
     }
   ]
 }
