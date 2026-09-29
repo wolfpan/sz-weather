@@ -1,0 +1,9 @@
+# OS / 编辑器杂项
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# 运行日志
+*.log

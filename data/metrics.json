@@ -1,0 +1,79 @@
+{
+  "nino34_ssta": {
+    "label": "Niño3.4 海温距平指数",
+    "unit": "℃",
+    "kind": "number",
+    "group": "海温（厄尔尼诺本体）",
+    "desc": "月度或候/旬尺度均可录入；正式定强用 3 个月滑动平均"
+  },
+  "sz_temp_month": {
+    "label": "深圳月平均气温",
+    "unit": "℃",
+    "kind": "number",
+    "group": "深圳 · 气温",
+    "desc": "录入日期填该月任意一天（建议月末）"
+  },
+  "sz_temp_daily_max": {
+    "label": "深圳日最高气温",
+    "unit": "℃",
+    "kind": "number",
+    "group": "深圳 · 气温",
+    "desc": "用于高温/破纪录事件"
+  },
+  "sz_temp_daily_min": {
+    "label": "深圳日最低气温",
+    "unit": "℃",
+    "kind": "number",
+    "group": "深圳 · 气温",
+    "desc": "用于寒潮/低温事件"
+  },
+  "sz_temp_drop_24h": {
+    "label": "深圳 24 小时降温幅度",
+    "unit": "℃",
+    "kind": "number",
+    "group": "深圳 · 气温",
+    "desc": "每次寒潮过程录入一次最大 24h 降温"
+  },
+  "sz_rain_month": {
+    "label": "深圳月降雨量",
+    "unit": "mm",
+    "kind": "number",
+    "group": "深圳 · 降水",
+    "desc": "录入日期填该月任意一天（建议月末）"
+  },
+  "sz_rain_daily": {
+    "label": "深圳日降雨量",
+    "unit": "mm",
+    "kind": "number",
+    "group": "深圳 · 降水",
+    "desc": "用于大暴雨（≥100mm）事件"
+  },
+  "sz_hot_days_cum": {
+    "label": "年内炎热日数累计（≥33℃）",
+    "unit": "天",
+    "kind": "number",
+    "group": "深圳 · 综合",
+    "desc": "录入最新累计值即可（取最大值判定）"
+  },
+  "sz_cold_days_cum": {
+    "label": "寒冷日数累计（≤10℃）",
+    "unit": "天",
+    "kind": "number",
+    "group": "深圳 · 综合",
+    "desc": "冬季内累计，录入最新累计值"
+  },
+  "sz_enter_autumn": {
+    "label": "入秋日期",
+    "unit": "",
+    "kind": "date",
+    "group": "深圳 · 季节",
+    "desc": "五天滑动平均气温 ≤22℃ 的首日"
+  },
+  "sz_enter_winter": {
+    "label": "入冬日期",
+    "unit": "",
+    "kind": "date",
+    "group": "深圳 · 季节",
+    "desc": "五天滑动平均气温 ≤10℃ 的首日"
+  }
+}

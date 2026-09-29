@@ -1,0 +1,678 @@
+{
+  "observations": [
+    {
+      "id": "O-seed-01",
+      "date": "2026-07-31",
+      "metric": "nino34_ssta",
+      "value": 2.09,
+      "source": "新华社 2026-08-18",
+      "note": "7 月月均指数，1951 年以来同期最高"
+    },
+    {
+      "id": "O-seed-02",
+      "date": "2026-08-31",
+      "metric": "nino34_ssta",
+      "value": 2.59,
+      "source": "新华社 2026-08-18",
+      "note": "8 月平均指数，创 1951 年以来同期最高"
+    },
+    {
+      "id": "O-seed-03",
+      "date": "2026-09-05",
+      "metric": "nino34_ssta",
+      "value": 2.7,
+      "source": "科学网/中国科学报 2026-09-21（许小峰）",
+      "note": "9 月第 1 候"
+    },
+    {
+      "id": "O-seed-04",
+      "date": "2026-09-10",
+      "metric": "nino34_ssta",
+      "value": 2.94,
+      "source": "科学网/中国科学报 2026-09-21（许小峰）",
+      "note": "9 月第 2 候，与 NOAA 周平均（2.7~2.9℃）吻合"
+    },
+    {
+      "id": "O-seed-05",
+      "date": "2026-09-15",
+      "metric": "nino34_ssta",
+      "value": 3.01,
+      "source": "科学网/中国科学报 2026-09-21（许小峰）",
+      "note": "9 月第 3 候，候尺度首次突破 3℃"
+    },
+    {
+      "id": "O-seed-06",
+      "date": "2025-10-31",
+      "metric": "sz_temp_month",
+      "value": 26.4,
+      "source": "《2025 年深圳市气候公报》",
+      "note": "2025 年 10 月，历史同期最高（背景参照）",
+      "background": true
+    },
+    {
+      "id": "O-seed-07",
+      "date": "2025-11-30",
+      "metric": "sz_rain_month",
+      "value": 2.9,
+      "source": "《2025 年深圳市气候公报》",
+      "note": "2025 年 11 月雨量极少（背景参照）",
+      "background": true
+    },
+    {
+      "id": "O-seed-08",
+      "date": "2025-12-31",
+      "metric": "sz_hot_days_cum",
+      "value": 60,
+      "source": "《2025 年深圳市气候公报》",
+      "note": "2025 年全年炎热日数 60 天，史上最多（背景参照）",
+      "background": true
+    },
+    {
+      "id": "O-seed-09",
+      "date": "2016-01-24",
+      "metric": "sz_temp_daily_min",
+      "value": 1.7,
+      "source": "深圳新闻网 2016 超级寒潮回顾",
+      "note": "2015/16 超强厄尔尼诺冬季：深圳有记录以来最低气温、建市以来首次冰粒（历史对照）",
+      "background": true
+    },
+    {
+      "id": "O-seed-10",
+      "date": "2023-12-15",
+      "metric": "sz_temp_daily_max",
+      "value": 30.8,
+      "source": "深圳市气象局",
+      "note": "2023/24 厄尔尼诺冬季：12 月上半月破同期纪录（历史对照）",
+      "background": true
+    },
+    {
+      "id": "O-seed-11",
+      "date": "2023-12-23",
+      "metric": "sz_temp_drop_24h",
+      "value": 12.8,
+      "source": "深圳市气象局",
+      "note": "2023/24 冬季下半月 48h 降温 12.8℃（历史对照，按 24h 口径近似记录）",
+      "background": true
+    },
+    {
+      "id": "auto-sz_temp_month-2026-05-31",
+      "metric": "sz_temp_month",
+      "date": "2026-05-31",
+      "value": 25.74,
+      "source": "Open-Meteo（ERA5/分析场）",
+      "note": "自动同步：2026-05 整月日均温平均（31 天）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_rain_month-2026-05-31",
+      "metric": "sz_rain_month",
+      "date": "2026-05-31",
+      "value": 182.7,
+      "source": "Open-Meteo（ERA5/分析场）",
+      "note": "自动同步：2026-05 整月降雨合计（31 天）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_month-2026-06-30",
+      "metric": "sz_temp_month",
+      "date": "2026-06-30",
+      "value": 27.33,
+      "source": "Open-Meteo（ERA5/分析场）",
+      "note": "自动同步：2026-06 整月日均温平均（30 天）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_rain_month-2026-06-30",
+      "metric": "sz_rain_month",
+      "date": "2026-06-30",
+      "value": 494.5,
+      "source": "Open-Meteo（ERA5/分析场）",
+      "note": "自动同步：2026-06 整月降雨合计（30 天）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_month-2026-07-31",
+      "metric": "sz_temp_month",
+      "date": "2026-07-31",
+      "value": 27.21,
+      "source": "Open-Meteo（ERA5/分析场）",
+      "note": "自动同步：2026-07 整月日均温平均（31 天）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_rain_month-2026-07-31",
+      "metric": "sz_rain_month",
+      "date": "2026-07-31",
+      "value": 502.4,
+      "source": "Open-Meteo（ERA5/分析场）",
+      "note": "自动同步：2026-07 整月降雨合计（31 天）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_month-2026-08-31",
+      "metric": "sz_temp_month",
+      "date": "2026-08-31",
+      "value": 28.35,
+      "source": "Open-Meteo（ERA5/分析场）",
+      "note": "自动同步：2026-08 整月日均温平均（31 天）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_rain_month-2026-08-31",
+      "metric": "sz_rain_month",
+      "date": "2026-08-31",
+      "value": 301,
+      "source": "Open-Meteo（ERA5/分析场）",
+      "note": "自动同步：2026-08 整月降雨合计（31 天）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-05-28",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-05-28",
+      "value": 33.4,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-05-29",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-05-29",
+      "value": 33.1,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-06-03",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-06-03",
+      "value": 33.5,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-06-04",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-06-04",
+      "value": 33.7,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-06-05",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-06-05",
+      "value": 33.8,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-06-06",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-06-06",
+      "value": 33.4,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_rain_daily-2026-06-08",
+      "metric": "sz_rain_daily",
+      "date": "2026-06-08",
+      "value": 50.3,
+      "source": "Open-Meteo",
+      "note": "自动同步：日雨量 ≥50mm",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_rain_daily-2026-06-14",
+      "metric": "sz_rain_daily",
+      "date": "2026-06-14",
+      "value": 83.6,
+      "source": "Open-Meteo",
+      "note": "自动同步：日雨量 ≥50mm",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_rain_daily-2026-06-15",
+      "metric": "sz_rain_daily",
+      "date": "2026-06-15",
+      "value": 50.1,
+      "source": "Open-Meteo",
+      "note": "自动同步：日雨量 ≥50mm",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-07-11",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-07-11",
+      "value": 33.6,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-07-12",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-07-12",
+      "value": 33.7,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-07-24",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-07-24",
+      "value": 33,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-07-25",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-07-25",
+      "value": 33.9,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_rain_daily-2026-07-26",
+      "metric": "sz_rain_daily",
+      "date": "2026-07-26",
+      "value": 119.9,
+      "source": "Open-Meteo",
+      "note": "自动同步：日雨量 ≥50mm",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_rain_daily-2026-07-27",
+      "metric": "sz_rain_daily",
+      "date": "2026-07-27",
+      "value": 50.3,
+      "source": "Open-Meteo",
+      "note": "自动同步：日雨量 ≥50mm",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-08-06",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-08-06",
+      "value": 33.7,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-08-07",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-08-07",
+      "value": 33,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-08-08",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-08-08",
+      "value": 35.4,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-08-09",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-08-09",
+      "value": 35.7,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-08-10",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-08-10",
+      "value": 35.3,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-08-11",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-08-11",
+      "value": 35.2,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-08-12",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-08-12",
+      "value": 34.2,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-08-13",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-08-13",
+      "value": 34.4,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-08-16",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-08-16",
+      "value": 33.1,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-08-29",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-08-29",
+      "value": 33.1,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-09-08",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-09-08",
+      "value": 33.3,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-09-19",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-09-19",
+      "value": 33.4,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-09-24",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-09-24",
+      "value": 33,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-09-26",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-09-26",
+      "value": 33.7,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-09-27",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-09-27",
+      "value": 33,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_temp_daily_max-2026-09-29",
+      "metric": "sz_temp_daily_max",
+      "date": "2026-09-29",
+      "value": 33.2,
+      "source": "Open-Meteo",
+      "note": "自动同步：日最高 ≥33℃（炎热日）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-sz_hot_days_cum-2026-09-29",
+      "metric": "sz_hot_days_cum",
+      "date": "2026-09-29",
+      "value": 26,
+      "source": "Open-Meteo",
+      "note": "自动同步：年内炎热日（≥33℃）累计（自序列起点）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:01:56.666Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2025-01-31",
+      "metric": "nino34_ssta",
+      "date": "2025-01-31",
+      "value": -0.71,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2025-02-28",
+      "metric": "nino34_ssta",
+      "date": "2025-02-28",
+      "value": -0.35,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2025-03-31",
+      "metric": "nino34_ssta",
+      "date": "2025-03-31",
+      "value": 0.1,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2025-04-30",
+      "metric": "nino34_ssta",
+      "date": "2025-04-30",
+      "value": -0.16,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2025-05-31",
+      "metric": "nino34_ssta",
+      "date": "2025-05-31",
+      "value": -0.04,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2025-06-30",
+      "metric": "nino34_ssta",
+      "date": "2025-06-30",
+      "value": 0.04,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2025-07-31",
+      "metric": "nino34_ssta",
+      "date": "2025-07-31",
+      "value": -0.06,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2025-08-31",
+      "metric": "nino34_ssta",
+      "date": "2025-08-31",
+      "value": -0.33,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2025-09-30",
+      "metric": "nino34_ssta",
+      "date": "2025-09-30",
+      "value": -0.44,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2025-10-31",
+      "metric": "nino34_ssta",
+      "date": "2025-10-31",
+      "value": -0.48,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2025-11-30",
+      "metric": "nino34_ssta",
+      "date": "2025-11-30",
+      "value": -0.68,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2025-12-31",
+      "metric": "nino34_ssta",
+      "date": "2025-12-31",
+      "value": -0.61,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2026-01-31",
+      "metric": "nino34_ssta",
+      "date": "2026-01-31",
+      "value": -0.54,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2026-02-28",
+      "metric": "nino34_ssta",
+      "date": "2026-02-28",
+      "value": -0.2,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2026-03-31",
+      "metric": "nino34_ssta",
+      "date": "2026-03-31",
+      "value": 0.03,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2026-04-30",
+      "metric": "nino34_ssta",
+      "date": "2026-04-30",
+      "value": 0.47,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2026-05-31",
+      "metric": "nino34_ssta",
+      "date": "2026-05-31",
+      "value": 0.94,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    },
+    {
+      "id": "auto-nino34_ssta-2026-06-30",
+      "metric": "nino34_ssta",
+      "date": "2026-06-30",
+      "value": 1.55,
+      "source": "NOAA CPC",
+      "note": "自动同步：Niño3.4 月距平指数（1991-2020 基准）",
+      "auto": true,
+      "fetchedAt": "2026-09-29T09:02:04.637Z"
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>深圳气温 × 超强厄尔尼诺 · 预测跟踪看板</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-main">
+    <h1>深圳气温 × 超强厄尔尼诺 · 预测跟踪看板</h1>
+    <p class="sub">依据《厄尔尼诺现象对深圳地区气温影响》深度研究报告（2026-10）建立 · 实况自动同步（Open-Meteo 深圳日值/实况 + NOAA CPC Niño3.4）· 人工录入可补充覆盖 · <a href="/report.md" target="_blank">报告原文</a></p>
+  </div>
+  <div class="topbar-right">
+    <span id="updated-at" class="muted"></span>
+    <div id="live-chip" class="live-chip"></div>
+    <div class="sync-row">
+      <span id="sync-status" class="muted"></span>
+      <button id="btn-sync" type="button">立即同步</button>
+      <button id="btn-refresh" type="button">刷新</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="kpis" class="kpi-row" aria-label="关键指标"></section>
+
+  <section class="panel">
+    <h2>Niño3.4 海温指数追踪 <span class="hint">实况 vs 预测峰值区间 · 超强阈值 · 历史三次超强事件对照</span></h2>
+    <div id="chart-nino"></div>
+  </section>
+
+  <div class="two-col">
+    <section class="panel">
+      <h2>深圳月平均气温 vs 常年 <span class="hint">录入月度实况后填充 · 2026-05 起跟踪</span></h2>
+      <div id="chart-temp"></div>
+    </section>
+    <section class="panel">
+      <h2>深圳月降雨量 vs 常年 <span class="hint">秋季干旱 ↔ 冬季湿冷 ↔ 前汛期偏强的两侧风险</span></h2>
+      <div id="chart-rain"></div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <h2>预测跟踪板 <span class="hint">按报告分期研判 · 状态由窗口内观测自动判定，可人工复核覆盖</span></h2>
+    <div id="board"></div>
+  </section>
+
+  <div class="two-col">
+    <section class="panel">
+      <h2>事件时间线 <span class="hint">披露 / 媒体 / 历史对照</span></h2>
+      <form id="event-form" class="form row-form">
+        <input type="date" name="date" required>
+        <select name="level">
+          <option>披露</option><option>媒体</option><option>研判</option><option>历史对照</option><option>其他</option>
+        </select>
+        <input type="text" name="title" placeholder="事件描述（如：深圳出现单日降温 11.2℃）" required>
+        <input type="text" name="source" placeholder="来源（可空）">
+        <button type="submit">添加事件</button>
+      </form>
+      <div id="timeline"></div>
+    </section>
+
+    <section class="panel">
+      <h2>数据录入 <span class="hint">对应左侧判定指标的实况</span></h2>
+      <form id="obs-form" class="form">
+        <div class="form-grid">
+          <label>指标 <select name="metric" id="f-metric"></select></label>
+          <label>日期 <input type="date" name="date" id="f-date" required></label>
+          <label id="f-value-label">数值 <input type="number" step="any" name="value" id="f-value" placeholder="如 3.2" required></label>
+          <label>来源 <input type="text" name="source" id="f-source" placeholder="如：深圳市气象局 / 国家气候中心"></label>
+          <label class="span2">备注 <input type="text" name="note" id="f-note" placeholder="口径、说明（可空）"></label>
+        </div>
+        <button type="submit">录入观测</button>
+        <p class="hint" id="f-hint"></p>
+      </form>
+
+      <h2 class="mt">最近观测记录 <span class="hint">带「背景」标签的不参与判定</span></h2>
+      <div id="obs-table"></div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <p>常年值（月均温/月雨量/季节基准）为按公开气候资料整理的近似参考，如与深圳市气象局官方值有出入，可在 <code>data/normals.json</code> 中修正。</p>
+  <p>本看板为报告预测的跟踪工具，气候预测存在固有不确定性；重大决策请以深圳市气象局与国家气候中心滚动发布的最新预测为准。</p>
+</footer>
+
+<div id="toast" class="toast"></div>
+<script src="/app.js"></script>
+</body>
+</html>

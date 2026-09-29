@@ -1,0 +1,12 @@
+{
+  "name": "sz-weather-enso-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "深圳气温 × 超强厄尔尼诺 预测跟踪看板（零依赖 Node.js）",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}
