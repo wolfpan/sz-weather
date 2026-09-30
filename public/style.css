@@ -99,6 +99,8 @@ main { padding: 20px 24px 40px; max-width: 1440px; margin: 0 auto; }
 .md-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
 .md-table th, .md-table td { border: 1px solid #22304a; padding: 4px 8px; text-align: left; }
 .md-table th { color: var(--accent); background: rgba(77, 163, 255, 0.06); font-weight: 600; }
+.live-note { font-size: 12px; color: var(--muted); background: rgba(77, 163, 255, 0.06); border: 1px solid #24406b; border-radius: 8px; padding: 6px 10px; margin: 6px 0; }
+.live-note b { color: #9fc5f5; }
 .ai-history { margin-top: 12px; }
 .ai-history summary { cursor: pointer; color: var(--muted); font-size: 12px; }
 .ai-history ul { color: var(--faint); font-size: 12px; padding-left: 20px; }

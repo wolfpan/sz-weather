@@ -491,6 +491,46 @@ function md2html(md) {
   return out.join('');
 }
 
+/* 旧版简报内嵌"预测逐项对照"表格（时点快照），展示时整节剔除，
+ * 逐项对照由下方实时表格承担 */
+function stripCompareSection(md) {
+  const lines = String(md).split(/\r?\n/);
+  const out = [];
+  let skipping = false;
+  for (const line of lines) {
+    const t = line.trim();
+    if (/^#{1,3}\s*预测逐项对照/.test(t)) { skipping = true; continue; }
+    if (skipping && /^##\s/.test(t)) skipping = false;
+    if (!skipping) out.push(line);
+  }
+  return out.join('\n').trim();
+}
+
+/* 实时"预测逐项对照"表：规则状态 + 最新 AI 判定，永远与跟踪板/顶部 KPI 同步 */
+function renderLiveCompareTable() {
+  const rows = STATE.predictions.map((p) => {
+    const meta = STATUS_META[p._eval.status] || STATUS_META.pending;
+    const j = p.aiJudge;
+    const aiCell = j
+      ? `<span class="badge ai-judge-badge">${esc(AI_VERDICT_LABEL[j.verdict] || j.verdict)}${Number.isFinite(Number(j.confidence)) ? ' · ' + Math.round(Number(j.confidence) * 100) + '%' : ''}</span>`
+      : '<span class="muted">—</span>';
+    const aiReason = j ? esc(j.reason) : '<span class="muted">尚未判定</span>';
+    return `<tr>
+      <td>${esc(p.id)}</td>
+      <td>${esc(p.title)}</td>
+      <td><span class="badge ${meta.cls}">${esc(p._eval.statusLabel)}</span></td>
+      <td>${aiCell}</td>
+      <td>${esc(p._eval.detail)}</td>
+      <td>${aiReason}</td>
+    </tr>`;
+  }).join('');
+  return `<div class="live-note">📋 下表为<b>实时对照</b>（规则状态 + 最新 AI 判定），始终与预测跟踪板、顶部「下一个验证节点」同步；其后 AI 文字为生成时点的点评。</div>
+  <div class="table-wrap"><table class="md-table">
+    <thead><tr><th>ID</th><th>预测项</th><th>规则状态</th><th>AI 判定</th><th>当前判定依据</th><th>AI 点评</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
 function renderAI() {
   const a = STATE.analysis || { llmConfigured: false, runs: [] };
   const body = $('#ai-body');
@@ -500,21 +540,25 @@ function renderAI() {
     body.innerHTML = `<div class="empty">尚未配置大模型：复制 <code>data/config.example.json</code> 为 <code>data/config.json</code>，填入 OpenAI 兼容接口的 <code>baseUrl / apiKey / model</code>（支持智谱 GLM、DeepSeek、OpenAI 等），保存后刷新本页即可启用「生成简报」与每日自动研判。</div>`;
     return;
   }
-  if (!a.runs.length) {
-    body.innerHTML = '<div class="empty">尚未生成简报，点击右上角「生成简报」。</div>';
-    return;
-  }
-  const [latest, ...rest] = a.runs;
-  body.innerHTML = `
+  // 对照表实时渲染，即使尚未生成简报也可用
+  let html = renderLiveCompareTable();
+  if (a.runs.length) {
+    const [latest, ...rest] = a.runs;
+    html += `
     <div class="ai-meta">
-      <span>${fmtTime(latest.at)}</span>
+      <span>AI 点评</span>
+      <span>· ${fmtTime(latest.at)}</span>
       <span>· ${esc(latest.model)}</span>
       <span>· 触发：${esc(latest.trigger || '手动')}</span>
       <span>· 数据截至 ${fmtTime(latest.dataAsOf)}</span>
       ${rest.length ? `<span>· 历史 ${rest.length} 次</span>` : ''}
     </div>
-    <div class="ai-content">${md2html(latest.md)}</div>
+    <div class="ai-content">${md2html(stripCompareSection(latest.md))}</div>
     ${rest.length ? `<details class="ai-history"><summary>历史简报</summary><ul>${rest.map((r) => `<li>${fmtTime(r.at)} · ${esc(r.model)} · ${esc(r.trigger || '手动')}</li>`).join('')}</ul></details>` : ''}`;
+  } else {
+    html += '<div class="empty">AI 点评尚未生成，点击右上角「生成简报」。</div>';
+  }
+  body.innerHTML = html;
 }
 
 /* ---------- 分页 ---------- */
