@@ -48,8 +48,8 @@
       "aiJudge": {
         "verdict": "pending",
         "confidence": 0.95,
-        "reason": "窗口11-01尚未开始，峰值无法判定。",
-        "at": "2026-09-30T02:09:38.306Z",
+        "reason": "窗口2026-11-01起未开始，当前最高3.01℃仅作参考",
+        "at": "2026-09-30T04:20:18.592Z",
         "model": "deepseek/deepseek-v4.1-flash"
       }
     },
@@ -73,9 +73,9 @@
       "note": "9 月第 3 候已达 3.01℃（候尺度），确认只是时间与口径问题。",
       "aiJudge": {
         "verdict": "active_ok",
-        "confidence": 0.95,
-        "reason": "窗口进行中，9月第3候3.01℃已≥2.5℃。",
-        "at": "2026-09-30T02:09:38.306Z",
+        "confidence": 0.9,
+        "reason": "窗口进行中，9月第3候已达3.01℃≥2.5℃",
+        "at": "2026-09-30T04:20:18.592Z",
         "model": "deepseek/deepseek-v4.1-flash"
       }
     },
@@ -100,8 +100,8 @@
       "aiJudge": {
         "verdict": "pending",
         "confidence": 0.95,
-        "reason": "窗口10-01未开始，无10月深圳均温。",
-        "at": "2026-09-30T02:09:38.306Z",
+        "reason": "窗口2026-10-01未开始，9月均温27.33℃不适用",
+        "at": "2026-09-30T04:20:18.592Z",
         "model": "deepseek/deepseek-v4.1-flash"
       }
     },
@@ -126,8 +126,8 @@
       "aiJudge": {
         "verdict": "pending",
         "confidence": 0.95,
-        "reason": "窗口11-01未开始，无11月深圳雨量。",
-        "at": "2026-09-30T02:09:38.306Z",
+        "reason": "窗口2026-11-01未开始，9月雨量106.3mm不适用",
+        "at": "2026-09-30T04:20:18.592Z",
         "model": "deepseek/deepseek-v4.1-flash"
       }
     },
@@ -152,9 +152,9 @@
       "note": "入秋标准：五天滑动平均 ≤22℃ 首日；若整个跟踪期未入秋同样视为兑现。",
       "aiJudge": {
         "verdict": "active",
-        "confidence": 0.9,
-        "reason": "窗口进行中，暂无入秋日期观测，基准11-08。",
-        "at": "2026-09-30T02:09:38.306Z",
+        "confidence": 0.8,
+        "reason": "窗口进行中，截至09-30无入秋观测记录",
+        "at": "2026-09-30T04:20:18.592Z",
         "model": "deepseek/deepseek-v4.1-flash"
       }
     },
@@ -180,8 +180,8 @@
       "aiJudge": {
         "verdict": "pending",
         "confidence": 0.95,
-        "reason": "窗口12-01未开始，无冬季均温数据。",
-        "at": "2026-09-30T02:09:38.306Z",
+        "reason": "窗口2026-12-01未开始，冬季均温尚无数据",
+        "at": "2026-09-30T04:20:18.592Z",
         "model": "deepseek/deepseek-v4.1-flash"
       }
     },
@@ -206,8 +206,8 @@
       "aiJudge": {
         "verdict": "pending",
         "confidence": 0.95,
-        "reason": "窗口12-01未开始，无单日降温数据。",
-        "at": "2026-09-30T02:09:38.306Z",
+        "reason": "窗口2026-12-01未开始，无24h降温数据",
+        "at": "2026-09-30T04:20:18.592Z",
         "model": "deepseek/deepseek-v4.1-flash"
       }
     },
@@ -252,8 +252,8 @@
       "aiJudge": {
         "verdict": "pending",
         "confidence": 0.95,
-        "reason": "窗口12-01未开始，无冬季最低温数据。",
-        "at": "2026-09-30T02:09:38.306Z",
+        "reason": "窗口2026-12-01未开始，冬季最低温无数据",
+        "at": "2026-09-30T04:20:18.592Z",
         "model": "deepseek/deepseek-v4.1-flash"
       }
     },
@@ -278,8 +278,8 @@
       "aiJudge": {
         "verdict": "pending",
         "confidence": 0.95,
-        "reason": "窗口12-01未开始，无冬季降水数据。",
-        "at": "2026-09-30T02:09:38.306Z",
+        "reason": "窗口2026-12-01未开始，冬季雨量无数据",
+        "at": "2026-09-30T04:20:18.592Z",
         "model": "deepseek/deepseek-v4.1-flash"
       }
     },
@@ -305,8 +305,8 @@
       "aiJudge": {
         "verdict": "pending",
         "confidence": 0.95,
-        "reason": "窗口12-01未开始，无入冬日期数据。",
-        "at": "2026-09-30T02:09:38.306Z",
+        "reason": "窗口2026-12-01未开始，入冬日期无数据",
+        "at": "2026-09-30T04:20:18.592Z",
         "model": "deepseek/deepseek-v4.1-flash"
       }
     },
@@ -331,8 +331,8 @@
       "aiJudge": {
         "verdict": "pending",
         "confidence": 0.95,
-        "reason": "窗口12-01未开始，无寒冷日数数据。",
-        "at": "2026-09-30T02:09:38.306Z",
+        "reason": "窗口2026-12-01未开始，寒冷日数无数据",
+        "at": "2026-09-30T04:20:18.592Z",
         "model": "deepseek/deepseek-v4.1-flash"
       }
     },
@@ -358,8 +358,8 @@
       "aiJudge": {
         "verdict": "pending",
         "confidence": 0.95,
-        "reason": "窗口2027-01-01未开始，无炎热日数。",
-        "at": "2026-09-30T02:09:38.306Z",
+        "reason": "窗口2027-01-01未开始，炎热日累计无数据",
+        "at": "2026-09-30T04:20:18.592Z",
         "model": "deepseek/deepseek-v4.1-flash"
       }
     },
@@ -384,8 +384,8 @@
       "aiJudge": {
         "verdict": "pending",
         "confidence": 0.95,
-        "reason": "窗口2027-04-01未开始，无前汛期雨量。",
-        "at": "2026-09-30T02:09:38.306Z",
+        "reason": "窗口2027-04-01未开始，4-6月雨量无数据",
+        "at": "2026-09-30T04:20:18.592Z",
         "model": "deepseek/deepseek-v4.1-flash"
       }
     },
@@ -409,8 +409,8 @@
       "aiJudge": {
         "verdict": "pending",
         "confidence": 0.95,
-        "reason": "窗口2027-04-01未开始，无日雨量数据。",
-        "at": "2026-09-30T02:09:38.306Z",
+        "reason": "窗口2027-04-01未开始，日雨量极值无数据",
+        "at": "2026-09-30T04:20:18.592Z",
         "model": "deepseek/deepseek-v4.1-flash"
       }
     }
