@@ -4,5 +4,8 @@
     "apiKey": "在此填入你的 API Key",
     "model": "glm-4.6",
     "maxTokens": 8000
+  },
+  "auth": {
+    "password": ""
   }
 }

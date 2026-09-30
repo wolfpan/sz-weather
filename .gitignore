@@ -10,3 +10,6 @@ Thumbs.db
 
 # 含密钥的本地配置（config.example.json 是入库的模板）
 data/config.json
+
+# 登录 token（本机运行时数据）
+data/auth.json

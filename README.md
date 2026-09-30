@@ -76,6 +76,21 @@
 - **口径**：窗口进行中禁止给出终局判定（verified/missed），只能给 active_ok / active；判定不得与预测自带阈值分档矛盾
 - **定位**：AI 判定是语义层参考（会引用数值解释"为什么"），不覆盖规则状态与人工复核
 
+## 操作密码验证
+
+写操作（录入/删除观测、添加事件、人工复核、立即同步、AI 生成/判定）可加简单密码验证，**查看数据不设限**：
+
+1. 在 `data/config.json` 中配置（模板见 `config.example.json`）：
+
+   ```json
+   { "auth": { "password": "你的密码" } }
+   ```
+
+   留空或不配置即不启用（默认）。
+2. 启用后，页面上执行任一写操作会自动弹出密码输入框——**输入一次即可**：服务端签发 UUID token 持久化在 `data/auth.json`（重启有效），浏览器存入 localStorage（刷新/重开浏览器有效），此后该设备长期免输。
+3. 也可用 curl 验证：`POST /api/auth/login {"password":"..."}` 取 token，写请求带 `X-Auth-Token: <token>` 头。
+4. 更换密码后旧 token 仍有效（token 与密码无耦合）；如需全部重新验证，删除 `data/auth.json` 重启即可。
+
 ## 运行
 
 ```bash

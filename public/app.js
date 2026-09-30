@@ -34,6 +34,33 @@ const STATUS_META = {
   review: { cls: 'st-review' },
 };
 
+/* 操作密码验证：UUID token 存 localStorage，输入一次持久有效；
+ * 服务端启用密码（config.json → auth.password）后，写操作返回 401 时
+ * 自动弹出密码输入，登录成功后重试原请求 */
+function getToken() { try { return localStorage.getItem('sz_auth_token') || ''; } catch { return ''; } }
+function setToken(t) { try { t ? localStorage.setItem('sz_auth_token', t) : localStorage.removeItem('sz_auth_token'); } catch { /* 忽略 */ } }
+
+async function authedFetch(url, options = {}) {
+  const headers = { ...(options.headers || {}) };
+  const tok = getToken();
+  if (tok) headers['X-Auth-Token'] = tok;
+  let r = await fetch(url, { ...options, headers });
+  if (r.status === 401) {
+    const data = await r.json().catch(() => ({}));
+    if (!data.needAuth) throw new Error(data.error || '请求失败');
+    const pw = prompt('此操作需要密码验证（密码配置于 data/config.json → auth.password）：');
+    if (pw === null) throw new Error('已取消：未输入密码');
+    const lr = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pw }) });
+    const ld = await lr.json().catch(() => ({}));
+    if (!lr.ok) throw new Error(ld.error || '密码错误');
+    setToken(ld.token);
+    toast('密码验证成功，本次设备长期有效');
+    headers['X-Auth-Token'] = ld.token;
+    r = await fetch(url, { ...options, headers });
+  }
+  return r;
+}
+
 const API = {
   async state() {
     const r = await fetch('/api/state');
@@ -41,13 +68,13 @@ const API = {
     return r.json();
   },
   async post(url, body) {
-    const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const r = await authedFetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const data = await r.json();
     if (!r.ok) throw new Error(data.error || '请求失败');
     return data;
   },
   async del(url) {
-    const r = await fetch(url, { method: 'DELETE' });
+    const r = await authedFetch(url, { method: 'DELETE' });
     const data = await r.json();
     if (!r.ok) throw new Error(data.error || '删除失败');
     return data;

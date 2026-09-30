@@ -9,6 +9,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { syncAll, readStatus, refreshCurrentWeather } = require('./sync');
 const llm = require('./llm');
 
@@ -25,6 +26,26 @@ const F = {
   events: path.join(DATA_DIR, 'events.json'),
   sync: path.join(DATA_DIR, 'sync.json'),
   analysis: path.join(DATA_DIR, 'analysis.json'),
+  config: path.join(DATA_DIR, 'config.json'),
+  auth: path.join(DATA_DIR, 'auth.json'),
+};
+
+/* ---------- 操作密码验证 ----------
+ * config.json → { "auth": { "password": "..." } }，留空或缺失即不启用。
+ * 登录成功签发 UUID 存入 data/auth.json（服务重启仍有效）；
+ * 客户端以 X-Auth-Token 头携带，localStorage 记忆，输入一次持久有效。 */
+const authPassword = () => {
+  try { return String(JSON.parse(fs.readFileSync(F.config, 'utf8')).auth.password || ''); }
+  catch { return ''; }
+};
+const readTokens = () => {
+  try { return JSON.parse(fs.readFileSync(F.auth, 'utf8')).tokens || []; }
+  catch { return []; }
+};
+const saveTokens = (tokens) => fs.writeFileSync(F.auth, JSON.stringify({ tokens }, null, 2) + '\n', 'utf8');
+const hasValidToken = (req) => {
+  const tok = req.headers['x-auth-token'];
+  return !!tok && readTokens().includes(String(tok));
 };
 
 const readJSON = (file, fallback) => {
@@ -260,6 +281,24 @@ function persistJudge(items, model) {
 
 async function handleApi(req, res, pathname) {
   const state = () => buildState();
+
+  // 登录签发 UUID（密码正确时；未启用密码则直接返回空 token）
+  if (req.method === 'POST' && pathname === '/api/auth/login') {
+    const body = await readBody(req);
+    const pw = authPassword();
+    if (!pw) return json(res, { token: null, note: '未启用密码验证' });
+    if (String(body.password || '') !== pw) return json(res, { error: '密码错误' }, 401);
+    const tokens = readTokens();
+    const token = crypto.randomUUID();
+    tokens.push(token);
+    saveTokens(tokens);
+    return json(res, { token });
+  }
+
+  // 写操作验证：启用密码后，除登录外的 POST/DELETE 均需有效 token（GET 查看不设限）
+  if (req.method !== 'GET' && authPassword() && !hasValidToken(req)) {
+    return json(res, { error: '此操作需要密码验证', needAuth: true }, 401);
+  }
 
   if (req.method === 'GET' && pathname === '/api/state') return json(res, state());
 
