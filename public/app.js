@@ -419,6 +419,7 @@ function renderPredCard(p) {
       ${autoLine}
       <div class="eval-sub">验证窗口 ${esc(p.window.start)} ~ ${esc(p.window.end)} · 指标：${esc(m.label || p.verify.metric)} · 窗口${ev.windowClosed ? '已结束' : ev.windowOpen ? '进行中' : '未开始'}${ev.obsCount ? ` · 窗口内观测 ${ev.obsCount} 条` : ''}</div>
     </div>
+    ${p.aiJudge ? renderAiJudge(p.aiJudge) : ''}
     <div class="pred-actions">
       <label>人工复核
         <select class="override" data-id="${esc(p.id)}">
@@ -431,6 +432,21 @@ function renderPredCard(p) {
       </label>
     </div>
   </article>`;
+}
+
+const AI_VERDICT_LABEL = {
+  verified: '已兑现', partial: '部分兑现', missed: '未兑现',
+  active_ok: '走向兑现', active: '暂不支持/数据不足', pending: '待验证',
+};
+
+function renderAiJudge(j) {
+  const label = AI_VERDICT_LABEL[j.verdict] || j.verdict;
+  const conf = Number.isFinite(Number(j.confidence)) && j.verdict ? ` · ${Math.round(Number(j.confidence) * 100)}%` : '';
+  return `<div class="ai-judge">
+    <span class="badge ai-judge-badge">AI ${esc(label)}${conf}</span>
+    <span class="ai-judge-reason">${esc(j.reason)}</span>
+    <span class="ai-judge-at">${fmtTime(j.at)} · ${esc(j.model || '')}</span>
+  </div>`;
 }
 
 /* ---------- AI 研判面板 ---------- */
@@ -539,7 +555,7 @@ function renderTimeline() {
 function renderObsTable() {
   const rows = [...STATE.observations].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 30);
   if (!rows.length) { $('#obs-table').innerHTML = '<div class="empty">暂无观测记录</div>'; return; }
-  $('#obs-table').innerHTML = `<table>
+  $('#obs-table').innerHTML = `<div class="table-wrap"><table>
     <thead><tr><th>日期</th><th>指标</th><th>数值</th><th>来源</th><th>备注</th><th></th></tr></thead>
     <tbody>${rows.map((o) => {
       const m = STATE.metrics[o.metric] || {};
@@ -553,7 +569,7 @@ function renderObsTable() {
         <td><button class="del-btn" data-id="${esc(o.id)}" title="删除该记录${o.auto ? '（自动记录会在下次同步恢复）' : ''}">✕</button></td>
       </tr>`;
     }).join('')}</tbody>
-  </table>`;
+  </table></div>`;
 }
 
 /* ---------- 录入表单 ---------- */
@@ -650,13 +666,48 @@ $('#btn-analysis').addEventListener('click', async () => {
   const old = btn.textContent;
   btn.textContent = '生成中…（30 秒 ~ 3 分钟）';
   try {
-    await API.post('/api/analysis', {});
+    const r = await API.post('/api/analysis', {});
     await refresh();
-    toast('AI 简报已生成');
+    toast(`AI 简报已生成（判定：${r._judgeNote || '未执行'}）`);
   } catch (err) { toast(err.message, true); }
   btn.disabled = false;
   btn.textContent = old;
 });
+
+$('#btn-judge').addEventListener('click', async () => {
+  const btn = $('#btn-judge');
+  btn.disabled = true;
+  const old = btn.textContent;
+  btn.textContent = 'AI 判定中…';
+  try {
+    const r = await API.post('/api/ai/judge', {});
+    await refresh();
+    toast(`AI 判定完成：${r._judgeNote || ''}`);
+  } catch (err) { toast(err.message, true); }
+  btn.disabled = false;
+  btn.textContent = old;
+});
+
+/* 顶栏：向下滚动自动折叠，向上滚动展开
+ * 事件监听 + 300ms 轻量轮询双通道：某些内嵌内核的页面滚动不派发 scroll 事件，
+ * 轮询保证任何环境下都生效；处理幂等，仅在状态变化时改 DOM */
+let lastScrollY = 0, topbarCollapsed = false;
+const updateTopbar = () => {
+  const y = window.scrollY || document.documentElement.scrollTop || 0;
+  const bar = document.querySelector('.topbar');
+  if (!bar) return;
+  let target = topbarCollapsed;
+  if (y > lastScrollY + 6 && y > 140) target = true;
+  else if (y < lastScrollY - 6 || y < 60) target = false;
+  if (target !== topbarCollapsed) {
+    topbarCollapsed = target;
+    bar.classList.toggle('collapsed', target);
+  }
+  lastScrollY = y;
+};
+window.addEventListener('scroll', updateTopbar, { passive: true, capture: true });
+document.addEventListener('scroll', updateTopbar, { passive: true, capture: true });
+setInterval(updateTopbar, 300);
 
 $('#btn-sync').addEventListener('click', async () => {
   const btn = $('#btn-sync');

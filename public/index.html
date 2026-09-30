@@ -44,7 +44,10 @@
   </div>
 
   <section class="panel">
-    <h2>预测跟踪板 <span class="hint">按报告分期研判 · 状态由窗口内观测自动判定，可人工复核覆盖</span></h2>
+    <h2 class="ai-head">预测跟踪板
+      <span class="hint">按报告分期研判 · 规则自动判定 + AI 逐项判定 · 可人工复核覆盖</span>
+      <button id="btn-judge" type="button" title="调用大模型对 14 项预测逐项给出语义判定（不改变规则状态）">AI 判定</button>
+    </h2>
     <div id="board"></div>
   </section>
 

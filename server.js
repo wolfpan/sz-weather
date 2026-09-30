@@ -235,12 +235,28 @@ function serveStatic(req, res, urlPath) {
       res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
       return res.end('Not Found');
     }
-    res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream' });
+    // 本地看板更新频繁：禁用缓存协商，保证刷新即拿到最新前端代码
+    res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
     res.end(buf);
   });
 }
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/* 把 AI 逐项判定写回 predictions.json（字段 aiJudge，不覆盖人工复核 statusOverride） */
+function persistJudge(items, model) {
+  const store = readJSON(F.predictions, { predictions: [] });
+  const at = new Date().toISOString();
+  const done = [];
+  for (const j of items || []) {
+    const p = store.predictions.find((x) => x.id === j.id);
+    if (!p) continue;
+    p.aiJudge = { verdict: j.verdict, confidence: j.confidence, reason: j.reason, at, model };
+    done.push(j.id);
+  }
+  writeJSON(F.predictions, store);
+  return done;
+}
 
 async function handleApi(req, res, pathname) {
   const state = () => buildState();
@@ -254,8 +270,8 @@ async function handleApi(req, res, pathname) {
 
   if (req.method === 'POST' && pathname === '/api/analysis') {
     const st = state();
-    const { md, model } = await llm.callLLM(st);
-    const runs = llm.saveRun({
+    const { md, model } = await llm.generateBriefing(st);
+    llm.saveRun({
       id: 'A' + Date.now().toString(36),
       at: new Date().toISOString(),
       model,
@@ -263,7 +279,18 @@ async function handleApi(req, res, pathname) {
       trigger: '手动',
       md,
     });
-    return json(res, { ...state(), _latestRun: runs.runs[0] });
+    // 简报之外顺带更新逐项 AI 判定（失败不影响简报）
+    let judgeNote = '未执行';
+    try { judgeNote = `已判定 ${persistJudge(await llm.judgePredictions(st)).length} 项`; }
+    catch (e) { judgeNote = `失败：${e.message.slice(0, 80)}`; }
+    return json(res, { ...state(), _judgeNote: judgeNote });
+  }
+
+  if (req.method === 'POST' && pathname === '/api/ai/judge') {
+    const st = state();
+    const { items, model } = await llm.judgePredictions(st);
+    const done = persistJudge(items, model);
+    return json(res, { ...state(), _judgeNote: `已判定 ${done.length} 项` });
   }
 
   if (req.method === 'POST' && pathname === '/api/observations') {
@@ -374,11 +401,16 @@ setInterval(() => {
     const lastRun = (llm.readAnalysis().runs || [])[0]; // 手动生成同样计入"每日一次"，避免重复调用
     if (lastRun && lastRun.at.slice(0, 10) === todayStr) return;
     const st = buildState();
-    llm.callLLM(st)
+    llm.generateBriefing(st)
       .then(({ md, model }) => {
         llm.saveRun({ id: 'A' + Date.now().toString(36), at: new Date().toISOString(), model, dataAsOf: st.now, trigger: '自动', md });
         console.log('[llm] 每日 AI 简报已生成');
+        return llm.judgePredictions(st);
       })
-      .catch((e) => console.error('[llm] 每日简报生成失败：', e.message));
+      .then(({ items, model }) => {
+        const done = persistJudge(items, model);
+        console.log(`[llm] 预测 AI 判定已更新（${done.length} 项）`);
+      })
+      .catch((e) => console.error('[llm] 每日任务失败：', e.message));
   } catch { /* 忽略定时任务异常 */ }
 }, 10 * 60 * 1000);

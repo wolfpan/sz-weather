@@ -44,7 +44,14 @@
           }
         ]
       },
-      "note": "正式定强看 3 个月滑动平均（≥2.5℃ 为超强）；跟踪页以录入的指数为代理指标。"
+      "note": "正式定强看 3 个月滑动平均（≥2.5℃ 为超强）；跟踪页以录入的指数为代理指标。",
+      "aiJudge": {
+        "verdict": "pending",
+        "confidence": 0.95,
+        "reason": "窗口2026-11-01未开始，当前峰值3.01℃仅作参考",
+        "at": "2026-09-30T01:01:50.007Z",
+        "model": "deepseek/deepseek-v4.1-flash"
+      }
     },
     {
       "id": "P0-2",
@@ -63,7 +70,14 @@
         "op": "gte",
         "target": 2.5
       },
-      "note": "9 月第 3 候已达 3.01℃（候尺度），确认只是时间与口径问题。"
+      "note": "9 月第 3 候已达 3.01℃（候尺度），确认只是时间与口径问题。",
+      "aiJudge": {
+        "verdict": "active_ok",
+        "confidence": 0.9,
+        "reason": "窗口进行中，9月第3候3.01℃已≥2.5",
+        "at": "2026-09-30T01:01:50.007Z",
+        "model": "deepseek/deepseek-v4.1-flash"
+      }
     },
     {
       "id": "P1-1",
@@ -82,6 +96,13 @@
         "op": "gte",
         "target": 25.7,
         "baseline_label": "常年 10 月约 25.2℃，偏高 ≥0.5℃ 视为明显偏暖"
+      },
+      "aiJudge": {
+        "verdict": "pending",
+        "confidence": 0.95,
+        "reason": "窗口2026-10-01未开始，无10月月均温",
+        "at": "2026-09-30T01:01:50.007Z",
+        "model": "deepseek/deepseek-v4.1-flash"
       }
     },
     {
@@ -101,6 +122,13 @@
         "op": "lte",
         "target": 35,
         "baseline_label": "常年 11 月约 35mm，≤常年视为偏少"
+      },
+      "aiJudge": {
+        "verdict": "pending",
+        "confidence": 0.95,
+        "reason": "窗口2026-11-01未开始，无11月雨量",
+        "at": "2026-09-30T01:01:50.007Z",
+        "model": "deepseek/deepseek-v4.1-flash"
       }
     },
     {
@@ -121,7 +149,14 @@
         "baseline": "11-08",
         "neverLabel": "至 2027-01-31 仍未入秋——持续偏暖，'秋季偏暖延长'兑现"
       },
-      "note": "入秋标准：五天滑动平均 ≤22℃ 首日；若整个跟踪期未入秋同样视为兑现。"
+      "note": "入秋标准：五天滑动平均 ≤22℃ 首日；若整个跟踪期未入秋同样视为兑现。",
+      "aiJudge": {
+        "verdict": "active",
+        "confidence": 0.85,
+        "reason": "窗口9-1起进行中，暂无入秋日期观测",
+        "at": "2026-09-30T01:01:50.007Z",
+        "model": "deepseek/deepseek-v4.1-flash"
+      }
     },
     {
       "id": "P2-1",
@@ -141,7 +176,14 @@
         "target": 16.8,
         "baseline_label": "常年冬季（12-2 月）均温约 16.5℃，偏高 ≥0.3℃ 视为偏暖"
       },
-      "note": "参照 2015/16 教训：全国冬温 +0.3℃ 但华南南部曾偏低 1~2℃（多雨寡照），'全国暖冬、华南偏冷'组合真实存在。"
+      "note": "参照 2015/16 教训：全国冬温 +0.3℃ 但华南南部曾偏低 1~2℃（多雨寡照），'全国暖冬、华南偏冷'组合真实存在。",
+      "aiJudge": {
+        "verdict": "pending",
+        "confidence": 0.95,
+        "reason": "窗口2026-12-01未开始，无冬季均温",
+        "at": "2026-09-30T01:01:50.007Z",
+        "model": "deepseek/deepseek-v4.1-flash"
+      }
     },
     {
       "id": "P2-2",
@@ -160,7 +202,14 @@
         "op": "gte",
         "target": 10
       },
-      "note": "对照：2023/24 冬季 48 小时降温 12.8℃（同期第三大）。"
+      "note": "对照：2023/24 冬季 48 小时降温 12.8℃（同期第三大）。",
+      "aiJudge": {
+        "verdict": "pending",
+        "confidence": 0.95,
+        "reason": "窗口2026-12-01未开始，无24h降温数据",
+        "at": "2026-09-30T01:01:50.007Z",
+        "model": "deepseek/deepseek-v4.1-flash"
+      }
     },
     {
       "id": "P2-3",
@@ -199,6 +248,13 @@
             "label": "冬季最低未跌破 10℃"
           }
         ]
+      },
+      "aiJudge": {
+        "verdict": "pending",
+        "confidence": 0.95,
+        "reason": "窗口2026-12-01未开始，无冬季最低温",
+        "at": "2026-09-30T01:01:50.007Z",
+        "model": "deepseek/deepseek-v4.1-flash"
       }
     },
     {
@@ -218,6 +274,13 @@
         "op": "gte",
         "target": 130,
         "baseline_label": "常年冬季总雨量约 108mm，偏多 ≥20% 视为偏多"
+      },
+      "aiJudge": {
+        "verdict": "pending",
+        "confidence": 0.95,
+        "reason": "窗口2026-12-01未开始，无冬季累计雨量",
+        "at": "2026-09-30T01:01:50.007Z",
+        "model": "deepseek/deepseek-v4.1-flash"
       }
     },
     {
@@ -238,7 +301,14 @@
         "baseline": "01-21",
         "neverLabel": "至 2027-03-31 仍未入冬——'入冬更难'兑现"
       },
-      "note": "入冬标准：五天滑动平均 ≤10℃ 首日。"
+      "note": "入冬标准：五天滑动平均 ≤10℃ 首日。",
+      "aiJudge": {
+        "verdict": "pending",
+        "confidence": 0.95,
+        "reason": "窗口2026-12-01未开始，无入冬日期",
+        "at": "2026-09-30T01:01:50.007Z",
+        "model": "deepseek/deepseek-v4.1-flash"
+      }
     },
     {
       "id": "P2-6",
@@ -257,6 +327,13 @@
         "op": "gte",
         "target": 1,
         "baseline_label": "常年冬季寒冷日数仅 0.8 天"
+      },
+      "aiJudge": {
+        "verdict": "pending",
+        "confidence": 0.95,
+        "reason": "窗口2026-12-01未开始，无寒冷日数",
+        "at": "2026-09-30T01:01:50.007Z",
+        "model": "deepseek/deepseek-v4.1-flash"
       }
     },
     {
@@ -277,7 +354,14 @@
         "target": 60,
         "baseline_label": "2025 年全年炎热日数 60 天为史上最多"
       },
-      "note": "以年内炎热日（≥33℃）累计数对照 2025 年纪录；影响滞后半年是厄尔尼诺对东亚的典型节奏。"
+      "note": "以年内炎热日（≥33℃）累计数对照 2025 年纪录；影响滞后半年是厄尔尼诺对东亚的典型节奏。",
+      "aiJudge": {
+        "verdict": "pending",
+        "confidence": 0.95,
+        "reason": "窗口2027-01-01未开始，无2027年炎热日数",
+        "at": "2026-09-30T01:01:50.007Z",
+        "model": "deepseek/deepseek-v4.1-flash"
+      }
     },
     {
       "id": "P3-2",
@@ -296,6 +380,13 @@
         "op": "gte",
         "target": 960,
         "baseline_label": "常年 4-6 月累计约 800mm，偏多 ≥20% 视为偏强"
+      },
+      "aiJudge": {
+        "verdict": "pending",
+        "confidence": 0.95,
+        "reason": "窗口2027-04-01未开始，无4-6月雨量",
+        "at": "2026-09-30T01:01:50.007Z",
+        "model": "deepseek/deepseek-v4.1-flash"
       }
     },
     {
@@ -314,6 +405,13 @@
         "agg": "max",
         "op": "gte",
         "target": 100
+      },
+      "aiJudge": {
+        "verdict": "pending",
+        "confidence": 0.95,
+        "reason": "窗口2027-04-01未开始，无日雨量数据",
+        "at": "2026-09-30T01:01:50.007Z",
+        "model": "deepseek/deepseek-v4.1-flash"
       }
     }
   ]
