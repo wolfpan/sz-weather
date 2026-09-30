@@ -26,6 +26,60 @@ const TIMEOUT = 20000;
 const today = () => new Date().toISOString().slice(0, 10);
 const round = (x, n) => Math.round(x * 10 ** n) / 10 ** n;
 const lastDayOfMonth = (ym) => new Date(Date.UTC(+ym.slice(0, 4), +ym.slice(5, 7), 0)).toISOString().slice(0, 10);
+const pad2 = (n) => String(n).padStart(2, '0');
+
+/* ---------- 实况换算 ---------- */
+
+const WMO_CODE = {
+  0: '晴', 1: '晴间多云', 2: '多云', 3: '阴',
+  45: '雾', 48: '雾凇',
+  51: '毛毛雨', 53: '毛毛雨', 55: '浓毛毛雨', 56: '冻毛毛雨', 57: '冻毛毛雨',
+  61: '小雨', 63: '中雨', 65: '大雨', 66: '冻雨', 67: '冻雨',
+  71: '小雪', 73: '中雪', 75: '大雪', 77: '霰',
+  80: '阵雨', 81: '阵雨', 82: '强阵雨', 85: '阵雪', 86: '阵雪',
+  95: '雷阵雨', 96: '雷阵雨伴冰雹', 99: '雷阵雨伴冰雹',
+};
+
+function windDirCN(deg) {
+  const d = Number(deg);
+  if (!Number.isFinite(d)) return '—';
+  const dirs = ['北', '东北', '东', '东南', '南', '西南', '西', '西北'];
+  return dirs[Math.round(d / 45) % 8] + '风';
+}
+
+function uvLevelCN(uv) {
+  if (uv < 3) return '最弱';
+  if (uv < 5) return '弱';
+  if (uv < 7) return '中等';
+  if (uv < 10) return '强';
+  return '很强';
+}
+
+/* 深圳当前实况（含体感/紫外线/风向等），供顶部实况条使用 */
+async function fetchCurrentWeather() {
+  const cur = await getJSON(`https://api.open-meteo.com/v1/forecast?latitude=${SZ.lat}&longitude=${SZ.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,uv_index,wind_speed_10m,wind_direction_10m,weather_code,is_day&hourly=uv_index&forecast_days=1&timezone=Asia%2FShanghai`);
+  const c = cur.current || {};
+  let uv = c.uv_index;
+  if ((uv === null || uv === undefined) && cur.hourly && Array.isArray(cur.hourly.time)) {
+    // current 不含 uv 时回退：取当前小时的逐时 uv_index
+    const now = new Date();
+    const key = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}T${pad2(now.getHours())}`;
+    const i = cur.hourly.time.findIndex((t) => String(t).startsWith(key));
+    if (i >= 0) uv = cur.hourly.uv_index[i];
+  }
+  return {
+    time: c.time,
+    temp: c.temperature_2m,
+    feels: c.apparent_temperature,
+    humidity: c.relative_humidity_2m,
+    uv: uv !== null && uv !== undefined ? round(Number(uv), 1) : null,
+    uvText: uv !== null && uv !== undefined ? `${uvLevelCN(Number(uv))} ${round(Number(uv), 1)}` : null,
+    wind: c.wind_speed_10m,
+    windDir: windDirCN(c.wind_direction_10m),
+    codeText: WMO_CODE[c.weather_code] || '—',
+    isDay: c.is_day === 1,
+  };
+}
 
 const readStatus = () => { try { return JSON.parse(fs.readFileSync(F_SYNC, 'utf8')); } catch { return null; } };
 const writeStatus = (s) => fs.writeFileSync(F_SYNC, JSON.stringify(s, null, 2) + '\n', 'utf8');
@@ -370,9 +424,8 @@ async function syncAll(manual = false) {
       }
 
       try {
-        const cw = await getJSON(`https://api.open-meteo.com/v1/forecast?latitude=${SZ.lat}&longitude=${SZ.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=Asia%2FShanghai`);
-        currentWeather = { time: cw.current.time, temp: cw.current.temperature_2m, humidity: cw.current.relative_humidity_2m, wind: cw.current.wind_speed_10m };
-        status.results.push({ name: 'Open-Meteo 深圳实况', ok: true, detail: `${cw.current.temperature_2m}℃ @ ${cw.current.time}` });
+        currentWeather = await fetchCurrentWeather();
+        status.results.push({ name: 'Open-Meteo 深圳实况', ok: true, detail: `${currentWeather.temp}℃（体感 ${currentWeather.feels}℃）@ ${currentWeather.time}` });
       } catch (e) {
         status.results.push({ name: 'Open-Meteo 深圳实况', ok: false, error: e.message });
       }
@@ -401,4 +454,15 @@ async function syncAll(manual = false) {
   return status;
 }
 
-module.exports = { syncAll, readStatus };
+/* 实况轻刷新：只更新 currentWeather（5 分钟一轮），不触碰其余数据 */
+async function refreshCurrentWeather() {
+  if (running) return;
+  try {
+    const cw = await fetchCurrentWeather();
+    const s = readStatus() || {};
+    s.currentWeather = cw;
+    writeStatus(s);
+  } catch { /* 静默，下轮再试 */ }
+}
+
+module.exports = { syncAll, readStatus, refreshCurrentWeather };

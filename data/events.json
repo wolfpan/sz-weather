@@ -65,7 +65,7 @@
       "level": "研判",
       "source": "跟踪看板 · 数据检测",
       "auto": true,
-      "fetchedAt": "2026-09-30T02:17:47.711Z"
+      "fetchedAt": "2026-09-30T02:41:43.761Z"
     },
     {
       "type": "heatwave",
@@ -76,7 +76,7 @@
       "level": "研判",
       "source": "跟踪看板 · 数据检测",
       "auto": true,
-      "fetchedAt": "2026-09-30T02:17:47.711Z"
+      "fetchedAt": "2026-09-30T02:41:43.761Z"
     },
     {
       "type": "heavy_rain",
@@ -87,7 +87,7 @@
       "level": "研判",
       "source": "跟踪看板 · 数据检测",
       "auto": true,
-      "fetchedAt": "2026-09-30T02:17:47.711Z"
+      "fetchedAt": "2026-09-30T02:41:43.761Z"
     },
     {
       "type": "heavy_rain",
@@ -98,7 +98,7 @@
       "level": "研判",
       "source": "跟踪看板 · 数据检测",
       "auto": true,
-      "fetchedAt": "2026-09-30T02:17:47.711Z"
+      "fetchedAt": "2026-09-30T02:41:43.761Z"
     },
     {
       "type": "heavy_rain",
@@ -109,7 +109,7 @@
       "level": "研判",
       "source": "跟踪看板 · 数据检测",
       "auto": true,
-      "fetchedAt": "2026-09-30T02:17:47.711Z"
+      "fetchedAt": "2026-09-30T02:41:43.761Z"
     },
     {
       "type": "heavy_rain",
@@ -120,7 +120,7 @@
       "level": "研判",
       "source": "跟踪看板 · 数据检测",
       "auto": true,
-      "fetchedAt": "2026-09-30T02:17:47.711Z"
+      "fetchedAt": "2026-09-30T02:41:43.761Z"
     },
     {
       "type": "heavy_rain",
@@ -131,7 +131,7 @@
       "level": "研判",
       "source": "跟踪看板 · 数据检测",
       "auto": true,
-      "fetchedAt": "2026-09-30T02:17:47.711Z"
+      "fetchedAt": "2026-09-30T02:41:43.761Z"
     },
     {
       "type": "month_anomaly",
@@ -142,7 +142,7 @@
       "level": "研判",
       "source": "跟踪看板 · 数据检测",
       "auto": true,
-      "fetchedAt": "2026-09-30T02:17:47.711Z"
+      "fetchedAt": "2026-09-30T02:41:43.761Z"
     }
   ]
 }

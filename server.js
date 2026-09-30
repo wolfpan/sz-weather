@@ -9,7 +9,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { syncAll, readStatus } = require('./sync');
+const { syncAll, readStatus, refreshCurrentWeather } = require('./sync');
 const llm = require('./llm');
 
 const ROOT = __dirname;
@@ -392,6 +392,8 @@ server.listen(PORT, () => {
 // 自动同步：启动后 2.5 秒首跑，之后每 30 分钟一次（外部源为日/周级更新，30 分钟足够"实时"）
 setTimeout(() => { syncAll().catch((e) => console.error('[sync]', e.message)); }, 2500);
 setInterval(() => { syncAll().catch((e) => console.error('[sync]', e.message)); }, 30 * 60 * 1000);
+// 深圳实况轻刷新：每 5 分钟只更新 currentWeather，顶部实况条保持新鲜
+setInterval(() => { refreshCurrentWeather().catch(() => {}); }, 5 * 60 * 1000);
 
 // AI 简报：每日一次（每 10 分钟检查一次当天是否已生成）；需在 data/config.json 配置 LLM
 setInterval(() => {

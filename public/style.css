@@ -39,16 +39,25 @@ code { background: #1a2540; padding: 1px 5px; border-radius: 4px; font-size: 12p
 /* 滚动折叠态：仅保留标题 + 同步状态 + 按钮 */
 .topbar.collapsed { padding: 8px 24px; }
 .topbar.collapsed h1 { font-size: 15px; }
-.topbar.collapsed .sub, .topbar.collapsed #live-chip, .topbar.collapsed #updated-at { display: none; }
+.topbar.collapsed .sub, .topbar.collapsed #updated-at { display: none; }
 .sync-row { display: flex; align-items: center; gap: 8px; }
 #sync-status { font-size: 11.5px; }
 .sync-err { color: var(--bad) !important; }
-.live-chip {
-  font-size: 12px; color: #9fc5f5; background: #152341; border: 1px solid #2c3f66;
-  border-radius: 999px; padding: 2px 12px; white-space: nowrap;
-}
-.live-chip:empty { display: none; }
 button:disabled { opacity: 0.55; cursor: wait; }
+
+/* 顶部实况条 */
+.live-strip {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px 22px;
+  background: linear-gradient(160deg, var(--panel) 0%, var(--panel2) 100%);
+  border: 1px solid var(--line); border-radius: 12px;
+  padding: 10px 18px; margin-bottom: 14px;
+}
+.live-strip[style*="none"] { display: none; }
+.ls-title { font-weight: 700; color: var(--accent); font-size: 13.5px; letter-spacing: 0.5px; }
+.ls-item { display: flex; flex-direction: column; gap: 1px; }
+.ls-label { font-size: 10.5px; color: var(--faint); }
+.ls-val { font-size: 14.5px; font-weight: 600; color: #dbe7ff; font-variant-numeric: tabular-nums; }
+.ls-time { margin-left: auto; color: var(--faint); font-size: 11px; }
 
 button {
   background: #1c2a47; color: var(--text); border: 1px solid #2c3f66;
@@ -242,7 +251,8 @@ tr.bg-row td { color: var(--faint); }
   .topbar h1 { font-size: 16px; }
   .topbar .sub { font-size: 11.5px; }
   .topbar-right { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 6px; white-space: normal; }
-  .live-chip { white-space: normal; }
+  .live-strip { gap: 8px 16px; padding: 10px 12px; }
+  .ls-time { margin-left: 0; width: 100%; }
 
   main { padding: 12px 12px 30px; }
   .kpi-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }

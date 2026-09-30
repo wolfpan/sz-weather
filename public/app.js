@@ -187,15 +187,30 @@ function renderKpis() {
 }
 
 /* ---------- 同步状态 ---------- */
+/* ---------- 同步状态与顶部实况条 ---------- */
+
+function renderLiveStrip() {
+  const el = $('#live-strip');
+  const s = STATE.sync;
+  const cw = s && s.currentWeather;
+  if (!cw || cw.temp === null || cw.temp === undefined) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = '';
+  const item = (label, val) => `<div class="ls-item"><span class="ls-label">${label}</span><span class="ls-val">${val}</span></div>`;
+  el.innerHTML = `
+    <span class="ls-title">深圳实况</span>
+    ${item('天气', esc(cw.codeText || '—'))}
+    ${item('气温', `${fmtNum(cw.temp)}℃`)}
+    ${item('体感', cw.feels !== null && cw.feels !== undefined ? `${fmtNum(cw.feels)}℃` : '—')}
+    ${item('湿度', cw.humidity !== null && cw.humidity !== undefined ? `${fmtNum(cw.humidity)}%` : '—')}
+    ${item('紫外线', cw.uvText ? esc(cw.uvText) : '—')}
+    ${item('风', `${esc(cw.windDir || '—')} ${cw.wind !== null && cw.wind !== undefined ? fmtNum(cw.wind) + 'km/h' : ''}`)}
+    <span class="ls-time">${esc(cw.time.slice(5, 16).replace('T', ' '))} · Open-Meteo</span>`;
+}
+
 function renderSync() {
   const s = STATE.sync;
-  const live = $('#live-chip');
   const st = $('#sync-status');
-  if (!s) { st.textContent = '同步未初始化'; live.innerHTML = ''; return; }
-  if (s.currentWeather) {
-    const cw = s.currentWeather;
-    live.textContent = `🌡 深圳 ${fmtNum(cw.temp)}℃ · 湿度 ${fmtNum(cw.humidity)}% · ${cw.time.slice(5, 16).replace('T', ' ')}`;
-  } else live.textContent = '';
+  if (!s) { st.textContent = '同步未初始化'; return; }
   if (s.running) { st.textContent = '同步中…'; st.className = 'muted'; return; }
   const results = s.results || [];
   const bad = results.filter((r) => !r.ok).length;
@@ -934,6 +949,7 @@ $('#btn-sync').addEventListener('click', async () => {
 async function refresh() {
   STATE = await API.state();
   renderKpis();
+  renderLiveStrip();
   renderSync();
   renderNinoChart();
   renderTempChart();
