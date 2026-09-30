@@ -371,8 +371,8 @@ setInterval(() => {
     const conf = llm.loadConfig();
     if (!conf.enabled) return;
     const todayStr = new Date().toISOString().slice(0, 10);
-    const lastAuto = (llm.readAnalysis().runs || []).find((r) => r.trigger === '自动');
-    if (lastAuto && lastAuto.at.slice(0, 10) === todayStr) return;
+    const lastRun = (llm.readAnalysis().runs || [])[0]; // 手动生成同样计入"每日一次"，避免重复调用
+    if (lastRun && lastRun.at.slice(0, 10) === todayStr) return;
     const st = buildState();
     llm.callLLM(st)
       .then(({ md, model }) => {

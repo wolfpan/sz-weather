@@ -11,7 +11,7 @@ const path = require('path');
 
 const F_CONF = path.join(__dirname, 'data', 'config.json');
 const F_ANALYSIS = path.join(__dirname, 'data', 'analysis.json');
-const TIMEOUT = 120000;
+const TIMEOUT = 300000; // 推理类模型生成完整简报可能需要数分钟
 
 function loadConfig() {
   let conf = {};
@@ -77,14 +77,20 @@ async function callLLM(state) {
     throw e;
   }
   const { system, user } = buildPrompt(state);
-  const r = await fetch(`${conf.baseUrl}/chat/completions`, {
+  // baseUrl 兼容两种写法：API 根地址（自动拼接）或完整 endpoint（已含 /chat/completions）
+  const endpoint = conf.baseUrl.endsWith('/chat/completions')
+    ? conf.baseUrl
+    : `${conf.baseUrl}/chat/completions`;
+  // 推理类模型（DeepSeek-R 系等）的思考 token 计入 max_tokens，默认给足余量，可在 config.llm.maxTokens 覆盖
+  const maxTokens = Number(conf.maxTokens) || 8000;
+  const r = await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${conf.apiKey}` },
     body: JSON.stringify({
       model: conf.model,
       messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
       temperature: 0.4,
-      max_tokens: 3000,
+      max_tokens: maxTokens,
     }),
     signal: AbortSignal.timeout(TIMEOUT),
   });
@@ -93,8 +99,12 @@ async function callLLM(state) {
     throw new Error(`LLM HTTP ${r.status}：${t.slice(0, 200)}`);
   }
   const data = await r.json();
+  if (data.error) {
+    const msg = typeof data.error === 'string' ? data.error : JSON.stringify(data.error);
+    throw new Error(`LLM 返回错误：${msg.slice(0, 300)}`);
+  }
   const md = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-  if (!md || !String(md).trim()) throw new Error('LLM 返回内容为空');
+  if (!md || !String(md).trim()) throw new Error(`LLM 返回内容为空：${JSON.stringify(data).slice(0, 300)}`);
   return { md: String(md).trim(), model: conf.model };
 }
 

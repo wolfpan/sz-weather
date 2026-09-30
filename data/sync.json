@@ -1,22 +1,22 @@
 {
   "running": false,
-  "startedAt": "2026-09-29T09:42:27.554Z",
-  "trigger": "定时",
+  "startedAt": "2026-09-30T00:51:52.361Z",
+  "trigger": "手动",
   "results": [
     {
       "name": "Open-Meteo 深圳日值",
       "ok": true,
-      "detail": "152 天日值 · 落库新增 0 / 更新 40 / 保留人工 0"
+      "detail": "65 天日值 · 落库新增 0 / 更新 22 / 保留人工 0"
     },
     {
       "name": "事件检测",
       "ok": true,
-      "detail": "自动事件新增 8 / 更新 1（时间线现共 16 条）"
+      "detail": "自动事件新增 0 / 更新 1（时间线现共 16 条）"
     },
     {
       "name": "Open-Meteo 深圳实况",
-      "ok": true,
-      "detail": "30.2℃ @ 2026-09-29T17:30"
+      "ok": false,
+      "error": "fetch failed"
     },
     {
       "name": "NOAA CPC Niño3.4 月指数",
@@ -24,18 +24,7 @@
       "detail": "20 条月值 · 落库新增 0 / 更新 18 / 保留人工 2"
     }
   ],
-  "currentMonth": {
-    "ym": "2026-09",
-    "asOf": "2026-09-29",
-    "days": 29,
-    "temp": 27.24,
-    "rain": 106.4
-  },
-  "currentWeather": {
-    "time": "2026-09-29T17:30",
-    "temp": 30.2,
-    "humidity": 74,
-    "wind": 11
-  },
-  "finishedAt": "2026-09-29T09:42:33.701Z"
+  "currentMonth": null,
+  "currentWeather": null,
+  "finishedAt": "2026-09-30T00:52:17.810Z"
 }

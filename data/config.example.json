@@ -2,6 +2,7 @@
   "llm": {
     "baseUrl": "https://open.bigmodel.cn/api/paas/v4",
     "apiKey": "在此填入你的 API Key",
-    "model": "glm-4.6"
+    "model": "glm-4.6",
+    "maxTokens": 8000
   }
 }

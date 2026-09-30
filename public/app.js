@@ -7,6 +7,15 @@ let STATE = null;
 const $ = (sel) => document.querySelector(sel);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+/* ISO(UTC) → 本地 "YYYY-MM-DD HH:mm" */
+function fmtTime(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d)) return String(iso);
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
 function fmtNum(v) {
   if (typeof v === 'number') {
     if (Number.isInteger(v)) return String(v);
@@ -116,7 +125,7 @@ function renderKpis() {
     ),
   ];
   $('#kpis').innerHTML = cards.join('');
-  $('#updated-at').textContent = `更新于 ${STATE.now.slice(0, 16).replace('T', ' ')}`;
+  $('#updated-at').textContent = `更新于 ${fmtTime(STATE.now)}`;
 }
 
 /* ---------- 同步状态 ---------- */
@@ -132,7 +141,7 @@ function renderSync() {
   if (s.running) { st.textContent = '同步中…'; st.className = 'muted'; return; }
   const results = s.results || [];
   const bad = results.filter((r) => !r.ok).length;
-  const t = s.finishedAt ? s.finishedAt.slice(5, 16).replace('T', ' ') : '';
+  const t = s.finishedAt ? fmtTime(s.finishedAt).slice(5) : '';
   st.textContent = `已同步 ${t} · 源 ${results.length - bad}✓${bad ? ` ${bad}✗` : ''}`;
   st.className = bad ? 'sync-err' : 'muted';
   st.title = results.map((r) => `${r.name}：${r.ok ? r.detail : `失败 ${r.error}`}`).join('\n') || '尚未运行';
@@ -482,14 +491,14 @@ function renderAI() {
   const [latest, ...rest] = a.runs;
   body.innerHTML = `
     <div class="ai-meta">
-      <span>${esc(latest.at.slice(0, 16).replace('T', ' '))}</span>
+      <span>${fmtTime(latest.at)}</span>
       <span>· ${esc(latest.model)}</span>
       <span>· 触发：${esc(latest.trigger || '手动')}</span>
-      <span>· 数据截至 ${esc((latest.dataAsOf || '').slice(0, 16).replace('T', ' '))}</span>
+      <span>· 数据截至 ${fmtTime(latest.dataAsOf)}</span>
       ${rest.length ? `<span>· 历史 ${rest.length} 次</span>` : ''}
     </div>
     <div class="ai-content">${md2html(latest.md)}</div>
-    ${rest.length ? `<details class="ai-history"><summary>历史简报</summary><ul>${rest.map((r) => `<li>${esc(r.at.slice(0, 16).replace('T', ' '))} · ${esc(r.model)} · ${esc(r.trigger || '手动')}</li>`).join('')}</ul></details>` : ''}`;
+    ${rest.length ? `<details class="ai-history"><summary>历史简报</summary><ul>${rest.map((r) => `<li>${fmtTime(r.at)} · ${esc(r.model)} · ${esc(r.trigger || '手动')}</li>`).join('')}</ul></details>` : ''}`;
 }
 
 /* ---------- 事件时间线（含来源筛选） ---------- */
@@ -639,7 +648,7 @@ $('#btn-analysis').addEventListener('click', async () => {
   const btn = $('#btn-analysis');
   btn.disabled = true;
   const old = btn.textContent;
-  btn.textContent = '生成中…（约 10~30 秒）';
+  btn.textContent = '生成中…（30 秒 ~ 3 分钟）';
   try {
     await API.post('/api/analysis', {});
     await refresh();
