@@ -270,15 +270,16 @@ async function handleApi(req, res, pathname) {
 
   if (req.method === 'POST' && pathname === '/api/analysis') {
     const st = state();
-    const { md, model } = await llm.generateBriefing(st);
-    llm.saveRun({
+    const { cards, md, model } = await llm.generateBriefing(st);
+    const run = {
       id: 'A' + Date.now().toString(36),
       at: new Date().toISOString(),
       model,
       dataAsOf: st.now,
       trigger: '手动',
-      md,
-    });
+    };
+    if (cards) run.cards = cards; else run.md = md;
+    llm.saveRun(run);
     // 简报之外顺带更新逐项 AI 判定（失败不影响简报）
     let judgeNote = '未执行';
     try { judgeNote = `已判定 ${persistJudge(await llm.judgePredictions(st)).length} 项`; }
@@ -402,8 +403,10 @@ setInterval(() => {
     if (lastRun && lastRun.at.slice(0, 10) === todayStr) return;
     const st = buildState();
     llm.generateBriefing(st)
-      .then(({ md, model }) => {
-        llm.saveRun({ id: 'A' + Date.now().toString(36), at: new Date().toISOString(), model, dataAsOf: st.now, trigger: '自动', md });
+      .then(({ cards, md, model }) => {
+        const run = { id: 'A' + Date.now().toString(36), at: new Date().toISOString(), model, dataAsOf: st.now, trigger: '自动' };
+        if (cards) run.cards = cards; else run.md = md;
+        llm.saveRun(run);
         console.log('[llm] 每日 AI 简报已生成');
         return llm.judgePredictions(st);
       })

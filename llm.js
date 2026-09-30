@@ -92,24 +92,58 @@ function baseSnapshot(state) {
 
 /* ---------- 简报生成 ---------- */
 
-function buildPrompt(state) {
+function buildBriefPrompt(state) {
   const snapshot = baseSnapshot(state);
   snapshot['预测与判定'] = state.predictions.map((p) => ({
     id: p.id, phase: p.phase, title: p.title,
     状态: p._eval.statusLabel, 窗口: `${p.window.start} ~ ${p.window.end}`,
+    窗口已结束: p._eval.windowClosed,
     判定明细: p._eval.detail, 基准口径: p.verify.baseline_label || undefined, 备注: p.note || undefined,
   }));
   const system = [
-    '你是助理气候分析师，为「深圳气温 × 厄尔尼诺预测跟踪看板」撰写结构化研判简报。规则：',
-    '1) 只允许引用用户输入 JSON 中的数据与事实；禁止引入输入之外的资讯或数值；某项数据缺失就写"数据不足"。',
-    '2) 每个结论必须标注依据（引用具体数值、状态或日期）。',
-    '3) 用简体中文 markdown；仅使用二级/三级标题、列表与粗体；不要输出表格、不要输出一级标题与结尾客套。',
-    '4) 固定三节：## 当前形势 / ## 下阶段关注点 / ## 风险提示。',
-    '5) 不要输出"预测逐项对照"表格——逐项状态由看板以实时数据另行渲染；但文字中可引用具体预测的 id、状态与数值展开点评。',
-    '6) 客观克制，区分"已发生事实"与"概率研判"，不渲染、不加免责声明。',
+    '你是助理气候分析师，为「深圳气温 × 厄尔尼诺预测跟踪看板」撰写结构化研判。规则：',
+    '1) 只依据输入 JSON 中的数据；禁止引入输入之外的资讯或数值；数据不足就如实写明。',
+    '2) 只输出一个 JSON 对象（禁止 markdown 代码块与任何解释文字），结构：',
+    '   {"situation":[{"title":"…","text":"…","metric":"可选指标键"}],"focus":[{"target":"P1-1","title":"…","text":"…","metric":"可选指标键"}],"risks":[{"title":"…","text":"…"}]}',
+    '3) situation（当前形势）2~4 条：概括数据要点，title ≤16 字，text ≤90 字且必须引用具体数值。',
+    '4) focus（下阶段关注点）2~4 条：target 必须取自预测清单的 id（优先窗口最早结束或最需关注者），text 说明该预测下阶段关注什么、依据是什么。',
+    '5) risks（风险提示）1~3 条：title ≤16 字，text ≤90 字。',
+    '6) metric 为可选绑定：仅可从输入给出的【可选指标键】中选择；绑定后看板会在卡片上实时显示该指标最新值。无法对应就不填该字段。',
+    '7) 客观克制，区分"已发生事实"与"概率研判"。',
   ].join('\n');
-  const user = `看板状态快照 JSON：\n${JSON.stringify(snapshot, null, 1)}\n\n请按系统规则输出研判简报。`;
+  const user = `看板状态快照 JSON：\n${JSON.stringify({ ...snapshot, 可选指标键: Object.entries(state.metrics).map(([key, m]) => ({ key, label: m.label })) }, null, 1)}\n\n请输出研判 JSON。`;
   return { system, user };
+}
+
+/* 解析结构化简报；任何不合法都返回 null（调用方退化为纯文本展示） */
+function parseBriefCards(text, validMetrics, validTargets) {
+  let t = String(text).trim().replace(/^```(?:json)?/i, '').replace(/```\s*$/, '').trim();
+  const a = t.indexOf('{'), b = t.lastIndexOf('}');
+  if (a < 0 || b <= a) return null;
+  let obj;
+  try { obj = JSON.parse(t.slice(a, b + 1)); } catch { return null; }
+  const norm = (arr, withTarget) => {
+    if (!Array.isArray(arr)) return [];
+    const items = [];
+    for (const it of arr) {
+      if (!it || typeof it !== 'object') continue;
+      const title = String(it.title || '').trim().slice(0, 40);
+      const text = String(it.text || '').trim().slice(0, 200);
+      if (!title || !text) continue;
+      const item = { title, text };
+      if (withTarget && validTargets.has(it.target)) item.target = it.target;
+      if (it.metric && validMetrics.has(it.metric)) item.metric = it.metric;
+      items.push(item);
+    }
+    return items.slice(0, 5);
+  };
+  const cards = {
+    situation: norm(obj.situation, false),
+    focus: norm(obj.focus, true),
+    risks: norm(obj.risks, false),
+  };
+  if (!cards.situation.length && !cards.focus.length && !cards.risks.length) return null;
+  return cards;
 }
 
 async function generateBriefing(state) {
@@ -119,9 +153,14 @@ async function generateBriefing(state) {
     e.code = 'NO_CONFIG';
     throw e;
   }
-  const { system, user } = buildPrompt(state);
-  const md = await callChat(conf, [{ role: 'system', content: system }, { role: 'user', content: user }]);
-  return { md, model: conf.model };
+  const validMetrics = new Set(Object.keys(state.metrics));
+  const validTargets = new Set(state.predictions.map((p) => p.id));
+  const { system, user } = buildBriefPrompt(state);
+  const out = await callChat(conf, [{ role: 'system', content: system }, { role: 'user', content: user }]);
+  const cards = parseBriefCards(out, validMetrics, validTargets);
+  if (cards) return { cards, model: conf.model };
+  // JSON 解析失败：退化为纯文本展示，不中断生成
+  return { md: out, model: conf.model, parseFallback: true };
 }
 
 /* ---------- 预测 AI 判定 ---------- */

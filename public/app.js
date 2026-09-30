@@ -552,13 +552,57 @@ function renderAI() {
       <span>· 触发：${esc(latest.trigger || '手动')}</span>
       <span>· 数据截至 ${fmtTime(latest.dataAsOf)}</span>
       ${rest.length ? `<span>· 历史 ${rest.length} 次</span>` : ''}
-    </div>
-    <div class="ai-content">${md2html(stripCompareSection(latest.md))}</div>
-    ${rest.length ? `<details class="ai-history"><summary>历史简报</summary><ul>${rest.map((r) => `<li>${fmtTime(r.at)} · ${esc(r.model)} · ${esc(r.trigger || '手动')}</li>`).join('')}</ul></details>` : ''}`;
+    </div>`;
+    if (latest.cards) {
+      // 结构化简报：焦点卡片（卡片可绑定实时指标值 / 关联预测实时状态）
+      html += focusSection('当前形势', latest.cards.situation)
+        + focusSection('下阶段关注点', latest.cards.focus)
+        + focusSection('风险提示', latest.cards.risks);
+    } else {
+      // 旧版 markdown 简报：剔除内嵌对照表后按原文展示
+      html += `<div class="ai-content">${md2html(stripCompareSection(latest.md || ''))}</div>`;
+    }
+    html += rest.length ? `<details class="ai-history"><summary>历史简报</summary><ul>${rest.map((r) => `<li>${fmtTime(r.at)} · ${esc(r.model)} · ${esc(r.trigger || '手动')}${r.cards ? ' · 结构化' : ''}</li>`).join('')}</ul></details>` : '';
   } else {
     html += '<div class="empty">AI 点评尚未生成，点击右上角「生成简报」。</div>';
   }
   body.innerHTML = html;
+}
+
+/* 焦点栏目：结构化简报卡片。卡片可绑定指标键（实时显示最新观测值）
+ * 或关联预测 id（实时显示其规则状态），"与数据同步"由渲染层保证 */
+function liveMetricChip(metricKey) {
+  const o = latestValue(metricKey);
+  const m = STATE.metrics[metricKey];
+  if (!o || !m) return '';
+  const val = m.kind === 'date' ? esc(o.value) : `${fmtNum(Number(o.value))}${esc(m.unit || '')}`;
+  return `<span class="live-chip-mini">实时 · ${esc(m.label)} ${val}（${esc(o.date)}）</span>`;
+}
+
+function focusCardHtml(c) {
+  let head = '';
+  if (c.target) {
+    const p = STATE.predictions.find((x) => x.id === c.target);
+    if (p) {
+      const meta = STATUS_META[p._eval.status] || STATUS_META.pending;
+      head = `<div class="fc-head"><span class="badge ${meta.cls}">${esc(p.id)} · ${esc(p._eval.statusLabel)}</span></div>`;
+    }
+  }
+  const live = c.metric ? liveMetricChip(c.metric) : '';
+  return `<div class="focus-card">
+    ${head}
+    <div class="fc-title">${esc(c.title)}</div>
+    <div class="fc-text">${esc(c.text)}</div>
+    ${live ? `<div class="fc-live">${live}</div>` : ''}
+  </div>`;
+}
+
+function focusSection(title, items) {
+  if (!items || !items.length) return '';
+  return `<div class="focus-section">
+    <h4>${esc(title)}</h4>
+    <div class="focus-grid">${items.map((c) => focusCardHtml(c)).join('')}</div>
+  </div>`;
 }
 
 /* ---------- 分页 ---------- */

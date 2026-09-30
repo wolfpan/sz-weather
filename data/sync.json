@@ -1,6 +1,6 @@
 {
   "running": false,
-  "startedAt": "2026-09-30T01:57:08.962Z",
+  "startedAt": "2026-09-30T02:17:46.145Z",
   "trigger": "定时",
   "results": [
     {
@@ -16,7 +16,7 @@
     {
       "name": "Open-Meteo 深圳实况",
       "ok": true,
-      "detail": "31℃ @ 2026-09-30T09:45"
+      "detail": "31.6℃ @ 2026-09-30T10:15"
     },
     {
       "name": "NOAA CPC Niño3.4 月指数",
@@ -26,10 +26,10 @@
   ],
   "currentMonth": null,
   "currentWeather": {
-    "time": "2026-09-30T09:45",
-    "temp": 31,
-    "humidity": 66,
-    "wind": 7.9
+    "time": "2026-09-30T10:15",
+    "temp": 31.6,
+    "humidity": 62,
+    "wind": 7.8
   },
-  "finishedAt": "2026-09-30T01:57:13.407Z"
+  "finishedAt": "2026-09-30T02:17:50.244Z"
 }

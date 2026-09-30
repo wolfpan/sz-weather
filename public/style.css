@@ -101,6 +101,17 @@ main { padding: 20px 24px 40px; max-width: 1440px; margin: 0 auto; }
 .md-table th { color: var(--accent); background: rgba(77, 163, 255, 0.06); font-weight: 600; }
 .live-note { font-size: 12px; color: var(--muted); background: rgba(77, 163, 255, 0.06); border: 1px solid #24406b; border-radius: 8px; padding: 6px 10px; margin: 6px 0; }
 .live-note b { color: #9fc5f5; }
+
+/* 焦点栏目卡片 */
+.focus-section { margin: 14px 0; }
+.focus-section h4 { margin: 0 0 8px; color: var(--accent); font-size: 13.5px; }
+.focus-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+.focus-card { background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.fc-head { margin-bottom: 6px; }
+.fc-title { font-weight: 600; font-size: 13px; color: #fff; margin-bottom: 4px; }
+.fc-text { font-size: 12.5px; color: #d9e4fa; line-height: 1.55; }
+.fc-live { margin-top: 8px; }
+.live-chip-mini { display: inline-block; font-size: 11px; color: #9fc5f5; background: #152341; border: 1px solid #2c3f66; border-radius: 999px; padding: 2px 10px; }
 .ai-history { margin-top: 12px; }
 .ai-history summary { cursor: pointer; color: var(--muted); font-size: 12px; }
 .ai-history ul { color: var(--faint); font-size: 12px; padding-left: 20px; }
