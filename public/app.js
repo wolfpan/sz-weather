@@ -688,22 +688,25 @@ $('#btn-judge').addEventListener('click', async () => {
   btn.textContent = old;
 });
 
-/* 顶栏：向下滚动自动折叠，向上滚动展开
- * 事件监听 + 300ms 轻量轮询双通道：某些内嵌内核的页面滚动不派发 scroll 事件，
- * 轮询保证任何环境下都生效；处理幂等，仅在状态变化时改 DOM */
-let lastScrollY = 0, topbarCollapsed = false;
+/* 顶栏：滚动折叠/展开
+ * 采用绝对阈值迟滞：滚过 COLLAPSE_AT 折叠，滚回 EXPAND_BELOW 以内展开。
+ * 两个阈值间隔必须大于折叠节省的高度差（约 70px）：顶栏折叠会使页面内容
+ * 上移，浏览器滚动锚定会反向回调 scrollY，若用"方向判定"或间隔过小，
+ * 锚定回弹会被误判为反向滚动，造成无输入时反复放大缩小。 */
+const COLLAPSE_AT = 200;
+const EXPAND_BELOW = 90;
+let topbarCollapsed = false;
 const updateTopbar = () => {
   const y = window.scrollY || document.documentElement.scrollTop || 0;
   const bar = document.querySelector('.topbar');
   if (!bar) return;
-  let target = topbarCollapsed;
-  if (y > lastScrollY + 6 && y > 140) target = true;
-  else if (y < lastScrollY - 6 || y < 60) target = false;
-  if (target !== topbarCollapsed) {
-    topbarCollapsed = target;
-    bar.classList.toggle('collapsed', target);
+  if (!topbarCollapsed && y > COLLAPSE_AT) {
+    topbarCollapsed = true;
+    bar.classList.add('collapsed');
+  } else if (topbarCollapsed && y < EXPAND_BELOW) {
+    topbarCollapsed = false;
+    bar.classList.remove('collapsed');
   }
-  lastScrollY = y;
 };
 window.addEventListener('scroll', updateTopbar, { passive: true, capture: true });
 document.addEventListener('scroll', updateTopbar, { passive: true, capture: true });
