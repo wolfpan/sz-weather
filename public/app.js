@@ -82,13 +82,75 @@ function latestValue(metric) {
 }
 
 /* ---------- KPI ---------- */
+
+/* 时节变化卡：入秋进度 + 气温同比 + 报告分期前瞻，全部由实时数据计算 */
+function seasonCard() {
+  const now = new Date();
+  const pd = (n) => String(n).padStart(2, '0');
+  const todayStr = `${now.getFullYear()}-${pd(now.getMonth() + 1)}-${pd(now.getDate())}`;
+  const normalMd = STATE.normals.enter_autumn_normal || '11-08';
+
+  // 入秋状态：以录入（自动判定/人工）的入秋日期与常年基准比较
+  const autumnObs = latestValue('sz_enter_autumn');
+  let big, cap1;
+  if (autumnObs) {
+    const d = String(autumnObs.value);
+    const diff = Math.round((new Date(d) - new Date(`${d.slice(0, 4)}-${normalMd}`)) / 86400000);
+    big = diff > 0 ? `入秋推迟 ${diff} 天` : diff < 0 ? `入秋早到 ${-diff} 天` : '入秋准时';
+    cap1 = `入秋日 ${d}（常年 ${normalMd}）`;
+  } else {
+    const normalFull = `${now.getFullYear()}-${normalMd}`;
+    const late = Math.round((new Date(todayStr) - new Date(normalFull)) / 86400000);
+    if (late > 0) {
+      big = `入秋推迟中 ${late} 天`;
+      cap1 = `常年 ${normalMd} 入秋，今尚未入秋`;
+    } else {
+      big = '未入秋';
+      cap1 = `距常年入秋（${normalMd}）约 ${-late} 天`;
+    }
+  }
+
+  // 气温同比：优先本月至今（自动同步），无则取最近一个整月，与常年比较
+  const cm = STATE.sync && STATE.sync.currentMonth;
+  const normalOf = (ym) => Number(STATE.normals.month_temp[String(Number(ym.slice(5, 7)))]);
+  let tempLine = '气温同比：暂无数据';
+  const anomalyLine = (label, v, ym) => {
+    const n = normalOf(ym);
+    if (!Number.isFinite(n)) return null;
+    const anom = Math.round((v - n) * 10) / 10;
+    return `气温同比：${label} ${fmtNum(v)}℃，较常年${anom >= 0 ? '偏高' : '偏低'} ${fmtNum(Math.abs(anom))}℃`;
+  };
+  if (cm && cm.temp !== null && cm.temp !== undefined) {
+    tempLine = anomalyLine(`${cm.ym.slice(5)}月至今`, cm.temp, cm.ym) || tempLine;
+  } else {
+    const o = latestValue('sz_temp_month');
+    if (o) tempLine = anomalyLine(o.date.slice(0, 7), Number(o.value), o.date) || tempLine;
+  }
+
+  // 前瞻：报告分期研判（时节 → 气温方向）
+  const ym = todayStr.slice(0, 7);
+  const PHASE_HINTS = [
+    { from: '2026-09', to: '2026-11', text: '发展年秋季：气温大概率升高，偏暖延长、少雨干燥' },
+    { from: '2026-12', to: '2027-02', text: '峰值期冬季：气温可能升高（暖冬基准），警惕冷暖过山车' },
+    { from: '2027-03', to: '2027-05', text: '衰减年春季：回南天或加剧，防旱涝急转' },
+    { from: '2027-06', to: '2027-09', text: '衰减年夏季：气温同比升高（热浪较 2026 更显著），龙舟水偏强' },
+  ];
+  const phase = PHASE_HINTS.find((h) => ym >= h.from && ym <= h.to);
+
+  return kpiCard(
+    '时节变化',
+    big,
+    `${cap1}<br>${tempLine}${phase ? `<br>前瞻：${esc(phase.text)}` : ''}`,
+    'accent'
+  );
+}
+
 function kpiCard(label, big, caption, tone) {
   return `<div class="kpi ${tone || ''}"><div class="kpi-label">${esc(label)}</div><div class="kpi-big">${big}</div><div class="kpi-cap">${caption}</div></div>`;
 }
 
 function renderKpis() {
   const nino = latestValue('nino34_ssta');
-  const c = STATE.summary.counts;
   const diff = nino ? Math.round((Number(nino.value) - 2.9) * 100) / 100 : null;
   const next = STATE.summary.nextChecks[0];
   const cards = [
@@ -113,11 +175,7 @@ function renderKpis() {
       '中国口径：峰值 ≥2.5℃ 为超强厄尔尼诺',
       nino && Number(nino.value) >= 2.5 ? 'good' : 'muted'
     ),
-    kpiCard(
-      '预测跟踪',
-      `${STATE.summary.total} 项`,
-      `已兑现 ${c.verified || 0} · 部分 ${c.partial || 0} · 未兑现 ${c.missed || 0} · 待验证 ${c.pending || 0} · 进行中 ${(c.active || 0) + (c.active_ok || 0)}${c.review ? ` · 复核 ${c.review}` : ''}`
-    ),
+    seasonCard(),
     kpiCard(
       '下一个验证节点',
       next ? esc(next.end) : '—',
