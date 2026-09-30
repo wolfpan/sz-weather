@@ -517,7 +517,32 @@ function renderAI() {
     ${rest.length ? `<details class="ai-history"><summary>历史简报</summary><ul>${rest.map((r) => `<li>${fmtTime(r.at)} · ${esc(r.model)} · ${esc(r.trigger || '手动')}</li>`).join('')}</ul></details>` : ''}`;
 }
 
-/* ---------- 事件时间线（含来源筛选） ---------- */
+/* ---------- 分页 ---------- */
+const PAGE_SIZE = 20;
+let tlPage = 1, tlTotal = 0, tlTotalPages = 1;
+let obsPage = 1, obsTotal = 0, obsTotalPages = 1;
+
+function pagerHtml(page, totalPages, total) {
+  if (!total) return '';
+  if (totalPages <= 1) return `<div class="pager">共 ${total} 条</div>`;
+  return `<div class="pager">
+    <button type="button" class="pg-btn" data-pg="first" ${page <= 1 ? 'disabled' : ''}>«</button>
+    <button type="button" class="pg-btn" data-pg="prev" ${page <= 1 ? 'disabled' : ''}>上一页</button>
+    <span class="pg-info">第 ${page} / ${totalPages} 页 · 共 ${total} 条</span>
+    <button type="button" class="pg-btn" data-pg="next" ${page >= totalPages ? 'disabled' : ''}>下一页</button>
+    <button type="button" class="pg-btn" data-pg="last" ${page >= totalPages ? 'disabled' : ''}>»</button>
+  </div>`;
+}
+
+function applyPage(current, action, totalPages) {
+  if (action === 'first') return 1;
+  if (action === 'prev') return Math.max(1, current - 1);
+  if (action === 'next') return Math.min(totalPages, current + 1);
+  if (action === 'last') return totalPages;
+  return current;
+}
+
+/* ---------- 事件时间线（含来源筛选与分页） ---------- */
 
 const TL_FILTERS = [
   ['all', '全部'], ['auto', '自动生成'], ['manual', '人工录入'],
@@ -534,27 +559,37 @@ function renderTlFilters() {
 function renderTimeline() {
   renderTlFilters();
   const all = [...STATE.events].sort((a, b) => (a.date < b.date ? 1 : -1));
-  const events = all.filter((e) => {
+  const filtered = all.filter((e) => {
     if (tlFilter === 'all') return true;
     if (tlFilter === 'auto') return !!e.auto;
     if (tlFilter === 'manual') return !e.auto;
     return e.level === tlFilter;
   });
-  if (!events.length) { $('#timeline').innerHTML = '<div class="empty">该筛选下暂无事件</div>'; return; }
-  $('#timeline').innerHTML = `<ol class="timeline">${events.map((e) => `
+  tlTotal = filtered.length;
+  tlTotalPages = Math.max(1, Math.ceil(tlTotal / PAGE_SIZE));
+  tlPage = Math.min(Math.max(1, tlPage), tlTotalPages);
+  const events = filtered.slice((tlPage - 1) * PAGE_SIZE, tlPage * PAGE_SIZE);
+  const listHtml = events.length
+    ? `<ol class="timeline">${events.map((e) => `
     <li>
       <span class="t-date">${esc(e.date)}</span>
       <div class="t-body">
         <span class="chip lv-${esc(e.level)}">${esc(e.level)}</span>${e.auto ? '<span class="tag-auto">自动</span> ' : ''}${esc(e.title)}
         ${e.source ? `<div class="t-src">来源：${esc(e.source)}</div>` : ''}
       </div>
-    </li>`).join('')}</ol>`;
+    </li>`).join('')}</ol>`
+    : '<div class="empty">该筛选下暂无事件</div>';
+  $('#timeline').innerHTML = listHtml + pagerHtml(tlPage, tlTotalPages, tlTotal);
 }
 
-/* ---------- 观测记录表 ---------- */
+/* ---------- 观测记录表（分页） ---------- */
 function renderObsTable() {
-  const rows = [...STATE.observations].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 30);
-  if (!rows.length) { $('#obs-table').innerHTML = '<div class="empty">暂无观测记录</div>'; return; }
+  const all = [...STATE.observations].sort((a, b) => (a.date < b.date ? 1 : -1));
+  obsTotal = all.length;
+  obsTotalPages = Math.max(1, Math.ceil(obsTotal / PAGE_SIZE));
+  obsPage = Math.min(Math.max(1, obsPage), obsTotalPages);
+  const rows = all.slice((obsPage - 1) * PAGE_SIZE, obsPage * PAGE_SIZE);
+  if (!rows.length) { $('#obs-table').innerHTML = '<div class="empty">暂无观测记录</div>' + pagerHtml(obsPage, obsTotalPages, obsTotal); return; }
   $('#obs-table').innerHTML = `<div class="table-wrap"><table>
     <thead><tr><th>日期</th><th>指标</th><th>数值</th><th>来源</th><th>备注</th><th></th></tr></thead>
     <tbody>${rows.map((o) => {
@@ -569,7 +604,7 @@ function renderObsTable() {
         <td><button class="del-btn" data-id="${esc(o.id)}" title="删除该记录${o.auto ? '（自动记录会在下次同步恢复）' : ''}">✕</button></td>
       </tr>`;
     }).join('')}</tbody>
-  </table></div>`;
+  </table></div>` + pagerHtml(obsPage, obsTotalPages, obsTotal);
 }
 
 /* ---------- 录入表单 ---------- */
@@ -607,6 +642,7 @@ async function submitObservation(e) {
     await API.post('/api/observations', body);
     toast('观测已录入，判定已更新');
     f.date.value = ''; f.value.value = ''; f.note.value = '';
+    obsPage = 1; // 新记录排在最前，跳回第 1 页可见
     await refresh();
   } catch (err) { toast(err.message, true); }
 }
@@ -618,6 +654,7 @@ async function submitEvent(e) {
     await API.post('/api/events', { date: f.date.value, level: f.level.value, title: f.title.value.trim(), source: f.source.value.trim() });
     toast('事件已添加');
     f.title.value = ''; f.source.value = '';
+    tlPage = 1;
     await refresh();
   } catch (err) { toast(err.message, true); }
 }
@@ -639,6 +676,14 @@ $('#board').addEventListener('change', async (e) => {
 });
 
 $('#obs-table').addEventListener('click', async (e) => {
+  const pg = e.target.closest('.pg-btn');
+  if (pg) {
+    if (!pg.disabled) {
+      obsPage = applyPage(obsPage, pg.dataset.pg, obsTotalPages);
+      renderObsTable();
+    }
+    return;
+  }
   const btn = e.target.closest('.del-btn');
   if (!btn) return;
   try {
@@ -657,6 +702,14 @@ $('#tl-filters').addEventListener('click', (e) => {
   const btn = e.target.closest('.chip-btn');
   if (!btn) return;
   tlFilter = btn.dataset.k;
+  tlPage = 1;
+  renderTimeline();
+});
+
+$('#timeline').addEventListener('click', (e) => {
+  const btn = e.target.closest('.pg-btn');
+  if (!btn || btn.disabled) return;
+  tlPage = applyPage(tlPage, btn.dataset.pg, tlTotalPages);
   renderTimeline();
 });
 

@@ -62,31 +62,34 @@
   <div class="two-col">
     <section class="panel">
       <h2>事件时间线 <span class="hint">披露 / 媒体 / 研判 / 数据检测自动生成</span></h2>
-      <div class="chip-row" id="tl-filters"></div>
-      <form id="event-form" class="form row-form">
-        <input type="date" name="date" required>
-        <select name="level">
+      <form id="event-form" class="entry-form">
+        <label>日期<input type="date" name="date" required></label>
+        <label>级别<select name="level">
           <option>披露</option><option>媒体</option><option>研判</option><option>历史对照</option><option>其他</option>
-        </select>
-        <input type="text" name="title" placeholder="事件描述（如：深圳出现单日降温 11.2℃）" required>
-        <input type="text" name="source" placeholder="来源（可空）">
-        <button type="submit">添加事件</button>
+        </select></label>
+        <label class="span2">事件描述<input type="text" name="title" placeholder="如：深圳出现单日降温 11.2℃" required></label>
+        <label class="span2">来源<input type="text" name="source" placeholder="如：央视新闻（可空）"></label>
+        <div class="entry-actions">
+          <button type="submit">添加事件</button>
+          <span class="hint">人工事件即时入库；自动事件由同步与检测生成</span>
+        </div>
       </form>
+      <div class="chip-row" id="tl-filters"></div>
       <div id="timeline"></div>
     </section>
 
     <section class="panel">
       <h2>数据录入 <span class="hint">对应左侧判定指标的实况</span></h2>
-      <form id="obs-form" class="form">
-        <div class="form-grid">
-          <label>指标 <select name="metric" id="f-metric"></select></label>
-          <label>日期 <input type="date" name="date" id="f-date" required></label>
-          <label id="f-value-label">数值 <input type="number" step="any" name="value" id="f-value" placeholder="如 3.2" required></label>
-          <label>来源 <input type="text" name="source" id="f-source" placeholder="如：深圳市气象局 / 国家气候中心"></label>
-          <label class="span2">备注 <input type="text" name="note" id="f-note" placeholder="口径、说明（可空）"></label>
+      <form id="obs-form" class="entry-form">
+        <label>指标<select name="metric" id="f-metric"></select></label>
+        <label>日期<input type="date" name="date" id="f-date" required></label>
+        <label id="f-value-label">数值<input type="number" step="any" name="value" id="f-value" placeholder="如 3.2" required></label>
+        <label>来源<input type="text" name="source" id="f-source" placeholder="如：深圳市气象局"></label>
+        <label class="span2">备注<input type="text" name="note" id="f-note" placeholder="口径、说明（可空）"></label>
+        <div class="entry-actions">
+          <button type="submit">录入观测</button>
+          <span class="hint" id="f-hint"></span>
         </div>
-        <button type="submit">录入观测</button>
-        <p class="hint" id="f-hint"></p>
       </form>
 
       <h2 class="mt">最近观测记录 <span class="hint">带「背景」标签的不参与判定</span></h2>
